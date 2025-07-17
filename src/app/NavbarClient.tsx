@@ -6,17 +6,17 @@ import { useAuth } from "../lib/AuthContext";
 export default function NavbarClient() {
   const { user, profile, signOut, loading } = useAuth();
   return (
-    <nav className="w-full flex items-center justify-between px-4 py-2 bg-white dark:bg-tusai-dark border-b border-tusai/20">
+    <nav className="w-full flex items-center justify-between px-4 py-2">
       <div className="flex items-center gap-2">
         <Link href="/">
           <Image src="/logo.svg" alt="TusAI Logo" width={36} height={36} className="mr-2" />
         </Link>
-        <span className="font-bold text-tusai text-lg">TusAI</span>
+        <span className="font-bold text-tusai-dark dark:text-tusai-light text-lg">TusAI</span>
       </div>
       <div className="flex gap-4 items-center">
-        <Link href="/" className="hover:underline">Ana Sayfa</Link>
-        <Link href="/quiz" className="hover:underline">Quizler</Link>
-        <Link href="/pricing" className="hover:underline">Fiyatlandırma</Link>
+        <Link href="/" className="hover:underline text-tusai-dark dark:text-tusai-light">Ana Sayfa</Link>
+        <Link href="/quiz" className="hover:underline text-tusai-dark dark:text-tusai-light">Quizler</Link>
+        <Link href="/pricing" className="hover:underline text-tusai-dark dark:text-tusai-light">Fiyatlandırma</Link>
       </div>
       <div className="flex gap-2 items-center">
         {loading ? null : user ? (
