@@ -11,10 +11,10 @@ const QUIZ_LIMIT_PREMIUM = 5;
 const MOCK_QUESTIONS = [
   {
     id: 1,
-    soru: "Aşağıdakilerden hangisi DNA'nın bir parçasıdır?",
+    soru: "Aşağıdakilerden hangisi DNA&apos;nın bir parçasıdır?",
     secenekler: ["Adenin", "Glukoz", "Lipid", "Kalsiyum"],
     dogru: 0,
-    aciklama: "Adenin, DNA'nın bazlarından biridir.",
+    aciklama: "Adenin, DNA&apos;nın bazlarından biridir.",
   },
   {
     id: 2,
@@ -29,7 +29,7 @@ const MOCK_QUESTIONS = [
 export default function QuizPage() {
   const { profile, loading, user } = useAuth();
   const [quizType, setQuizType] = useState<string | null>(null);
-  const [quizCountToday, setQuizCountToday] = useState(0); // TODO: Replace with real data
+  const [quizCountToday] = useState(0); // TODO: Replace with real data
   const [started, setStarted] = useState(false);
   const [answers, setAnswers] = useState<(number | null)[]>(Array(MOCK_QUESTIONS.length).fill(null));
   const [submitted, setSubmitted] = useState(false);
@@ -159,7 +159,7 @@ export default function QuizPage() {
           </div>
         )}
         <div className="mt-8 text-xs text-center opacity-70">
-          Quiz geçmişinizi görmek için <Link href="/" className="text-tusai-accent underline">Ana Sayfa</Link>'yı ziyaret edin.
+          Quiz geçmişinizi görmek için <Link href="/" className="text-tusai-accent underline">Ana Sayfa</Link>&apos;yı ziyaret edin.
         </div>
         <FeatureGate premium>
           <div className="mt-12 w-full">

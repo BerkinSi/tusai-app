@@ -11,13 +11,11 @@ export default function KayitPage() {
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setSuccess(false);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -36,7 +34,6 @@ export default function KayitPage() {
         is_premium: false,
       });
     }
-    setSuccess(true);
     setLoading(false);
     router.push("/giris");
   };

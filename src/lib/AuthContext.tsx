@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
+import type { User } from '@supabase/supabase-js';
 
 interface Profile {
   id: string;
@@ -12,7 +13,7 @@ interface Profile {
 }
 
 interface AuthContextType {
-  user: any;
+  user: User | null;
   profile: Profile | null;
   loading: boolean;
   signOut: () => Promise<void>;
@@ -21,7 +22,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -48,12 +49,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => {
       authListener.subscription.unsubscribe();
     };
-    // eslint-disable-next-line
   }, []);
 
   const fetchProfile = async (userId: string) => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', userId)
