@@ -134,13 +134,13 @@ export default function KayitPage() {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            Hesap oluşturarak{" "}
-            <Link href="/gizlilik" className="underline hover:text-gray-700 dark:hover:text-gray-300">
-              Gizlilik Politikası
-            </Link>
-            'nı kabul etmiş olursunuz.
-          </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+              Hesap oluşturarak{" "}
+              <Link href="/gizlilik" className="underline hover:text-gray-700 dark:hover:text-gray-300">
+                Gizlilik Politikası
+              </Link>
+              &apos;nı kabul etmiş olursunuz.
+            </p>
         </div>
       </div>
     </div>
