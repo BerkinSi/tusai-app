@@ -2,6 +2,7 @@ import '../app/globals.css';
 
 import { AuthProvider } from '../lib/AuthContext';
 import NavbarClient from './NavbarClient';
+import Footer from './Footer';
 import { Geist, Geist_Mono } from 'next/font/google';
 import Head from 'next/head';
 
@@ -39,9 +40,7 @@ export default function RootLayout({
           <main className="min-h-[80vh] flex flex-col items-center justify-center w-full">
             {children}
           </main>
-          <footer className="w-full py-8 px-4 bg-tusai-light dark:bg-tusai-dark border-t border-tusai-light dark:border-tusai-dark text-center text-xs text-tusai-dark dark:text-tusai-light">
-            © {new Date().getFullYear()} TusAI – TUS Hazırlık Asistanı | <a href="mailto:destek@tusai.app" className="underline">destek@tusai.app</a>
-          </footer>
+          <Footer />
         </AuthProvider>
       </body>
     </html>

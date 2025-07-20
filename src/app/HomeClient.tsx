@@ -61,7 +61,7 @@ export default function HomeClient() {
           TUS&apos;a Yapay Zeka ile Hazırlan
         </h1>
         <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
-          Çıkmış sorular ve akıllı quizlerle sınava daha bilinçli hazırlan. Üstelik tamamen Türkçe, mobil uyumlu ve kullanıcı dostu.
+        Çıkmış sorular ve yapay zekâ destekli içeriklerle quiz çöz, eksiklerini keşfet, sıralamadaki yerini gör.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
