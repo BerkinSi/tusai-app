@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function KayitPage() {
   const router = useRouter();
@@ -39,46 +40,107 @@ export default function KayitPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-tusai-light dark:bg-tusai-dark">
-      <div className="bg-white dark:bg-tusai-dark border border-tusai rounded-lg shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-2xl font-bold mb-6 text-center text-tusai">Kayıt Ol</h1>
-        <form onSubmit={handleSignup} className="flex flex-col gap-4">
-          <label className="font-semibold">Ad Soyad</label>
-          <input
-            type="text"
-            className="input input-bordered border-tusai px-3 py-2 rounded"
-            value={fullName}
-            onChange={e => setFullName(e.target.value)}
-            required
-          />
-          <label className="font-semibold">E-posta</label>
-          <input
-            type="email"
-            className="input input-bordered border-tusai px-3 py-2 rounded"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-          <label className="font-semibold">Şifre</label>
-          <input
-            type="password"
-            className="input input-bordered border-tusai px-3 py-2 rounded"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-          {error && <div className="text-red-600 text-sm">{error}</div>}
-          <button
-            type="submit"
-            className="bg-tusai text-white font-semibold py-2 rounded hover:bg-tusai-accent transition mt-2"
-            disabled={loading}
-          >
-            {loading ? "Kayıt Olunuyor..." : "Kayıt Ol"}
-          </button>
-        </form>
-        <div className="text-center mt-4 text-sm">
-          Zaten hesabınız var mı? {" "}
-          <Link href="/giris" className="text-tusai font-semibold hover:underline">Giriş Yap</Link>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-4">
+      <div className="w-full max-w-md">
+        {/* Logo and Brand */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Image src="/logo.svg" alt="TusAI Logo" width={48} height={48} className="flex-shrink-0" />
+            <span className="font-bold text-2xl text-gray-900 dark:text-white">TusAI</span>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Hesap Oluştur</h1>
+          <p className="text-gray-600 dark:text-gray-400">TUS hazırlık yolculuğunuza başlayın</p>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-8">
+          <form onSubmit={handleSignup} className="space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Ad Soyad
+              </label>
+              <input
+                type="text"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                placeholder="Adınız ve soyadınız"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                E-posta
+              </label>
+              <input
+                type="email"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="ornek@email.com"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Şifre
+              </label>
+              <input
+                type="password"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="En az 6 karakter"
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4">
+                <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Kayıt Olunuyor...
+                </div>
+              ) : (
+                "Hesap Oluştur"
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-600 dark:text-gray-400 text-sm">
+              Zaten hesabınız var mı?{" "}
+              <Link 
+                href="/giris" 
+                className="text-blue-600 dark:text-blue-400 font-semibold hover:underline transition-colors"
+              >
+                Giriş Yap
+              </Link>
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Hesap oluşturarak{" "}
+            <Link href="/gizlilik" className="underline hover:text-gray-700 dark:hover:text-gray-300">
+              Gizlilik Politikası
+            </Link>
+            'nı kabul etmiş olursunuz.
+          </p>
         </div>
       </div>
     </div>
