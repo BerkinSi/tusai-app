@@ -22,19 +22,19 @@ export default function NavbarClient() {
         <div className="flex gap-8 items-center">
           <Link 
             href="/" 
-            className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
           >
             Ana Sayfa
           </Link>
           <Link 
             href="/nasil-calisir" 
-            className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
           >
             Nasıl Çalışır?
           </Link>
           <Link 
             href="/pricing" 
-            className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
           >
             Fiyatlandırma
           </Link>
@@ -42,13 +42,13 @@ export default function NavbarClient() {
         <div className="flex gap-3 items-center">
           <Link 
             href="/giris" 
-            className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
           >
             Giriş Yap
           </Link>
           <Link 
             href="/kayit" 
-            className="text-sm bg-black dark:bg-white text-white dark:text-black px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200 font-medium"
+            className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200 font-medium"
           >
             Kayıt Ol
           </Link>
@@ -71,7 +71,7 @@ export default function NavbarClient() {
       <div className="flex-1 flex justify-center">
         <Link 
           href="/quiz/new" 
-          className="bg-black dark:bg-white text-white dark:text-black font-medium px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2"
         >
           <DocumentTextIcon className="w-4 h-4" />
           Yeni Quiz Oluştur
@@ -96,7 +96,7 @@ export default function NavbarClient() {
           <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
             <div className="p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-3">
-                <UserIcon className="w-8 h-8 text-gray-600 dark:text-gray-300" />
+                <UserIcon className="w-8 h-8 text-blue-600" />
                 <div>
                   <div className="font-medium text-gray-900 dark:text-white">
                     {profile?.full_name || user?.email}

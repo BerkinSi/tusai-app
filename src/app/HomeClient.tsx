@@ -57,8 +57,8 @@ export default function HomeClient() {
           <Image src="/logo.svg" alt="TusAI Logo" width={48} height={48} className="flex-shrink-0" />
           <span className="font-semibold text-2xl text-gray-900 dark:text-white">TusAI</span>
         </div>
-        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-2 text-gray-900 dark:text-white">
-          Yapay Zeka ile TUS&apos;a Hazırlanmanın Yeni Yolu
+        <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-2 text-blue-600">
+          TUS&apos;a Yapay Zeka ile Hazırlan
         </h1>
         <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6">
           Çıkmış sorular ve akıllı quizlerle sınava daha bilinçli hazırlan. Üstelik tamamen Türkçe, mobil uyumlu ve kullanıcı dostu.
@@ -66,13 +66,13 @@ export default function HomeClient() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
             href="/kayit" 
-            className="bg-black dark:bg-white text-white dark:text-black font-medium px-8 py-3 rounded-md shadow-sm hover:shadow-md transition-all duration-200 text-lg"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-md shadow-sm hover:shadow-md transition-all duration-200 text-lg"
           >
             Ücretsiz Başla
           </Link>
           <a 
             href="/pricing" 
-            className="text-black dark:text-white border border-gray-300 dark:border-gray-600 font-medium px-8 py-3 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 text-lg"
+            className="text-blue-600 border border-blue-600 font-medium px-8 py-3 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 text-lg"
           >
             Premium&apos;a Geç
           </a>
@@ -81,7 +81,7 @@ export default function HomeClient() {
 
       {/* Why TusAI Section */}
       <section className="flex flex-col items-center gap-8 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-        <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Neden TusAI?</h2>
+        <h2 className="text-2xl font-bold mb-2 text-blue-600">Neden TusAI?</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full">
           {features.map((f, i) => (
             <div key={i} className="flex items-start gap-4 p-6 rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -97,7 +97,7 @@ export default function HomeClient() {
 
       {/* How It Works Section */}
       <section className="flex flex-col items-center gap-8 bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-        <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Nasıl Çalışır?</h2>
+        <h2 className="text-2xl font-bold mb-2 text-blue-600">Nasıl Çalışır?</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 w-full">
           {steps.map((s, i) => (
             <div key={i} className="flex flex-col items-center gap-3 p-6 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm">
@@ -111,7 +111,7 @@ export default function HomeClient() {
 
       {/* Trust Section */}
       <section className="flex flex-col items-center gap-4 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">TUS Adaylarının Güvendiği Platform</h2>
+        <h2 className="text-xl font-bold text-blue-600">TUS Adaylarının Güvendiği Platform</h2>
         <p className="text-gray-600 dark:text-gray-300 text-center max-w-xl">
           1000+ TUS adayı tarafından güvenle kullanılan, yapay zeka destekli quiz platformu. Hemen ücretsiz deneyin ve sınava bir adım önde başlayın!
         </p>
