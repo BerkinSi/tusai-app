@@ -8,6 +8,7 @@ jest.mock('./AuthContext', () => ({
   useAuth: () => ({ profile: { is_premium: false }, loading: false })
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useAuth } from './AuthContext';
 
 describe('FeatureGate', () => {
@@ -23,6 +24,7 @@ describe('FeatureGate', () => {
   });
 
   it('renders children for premium', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const mockUseAuth = jest.spyOn(require('./AuthContext'), 'useAuth');
     mockUseAuth.mockReturnValue({ profile: { is_premium: true }, loading: false });
     render(<FeatureGate premium><div>Premium Content</div></FeatureGate>);

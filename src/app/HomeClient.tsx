@@ -46,6 +46,7 @@ const steps = [
 ];
 
 export default function HomeClient() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { user: _user, profile: _profile, loading: _loading } = useAuth();
 
   return (
