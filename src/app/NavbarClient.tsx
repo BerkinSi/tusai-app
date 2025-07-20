@@ -25,8 +25,8 @@ export default function NavbarClient() {
           <Link href="/pricing" className="hover:underline text-tusai-dark dark:text-tusai-light">Fiyatlandırma</Link>
         </div>
         <div className="flex gap-2 items-center">
-          <Link href="/giris" className="text-xs bg-tusai text-white px-3 py-1 rounded hover:bg-tusai-accent transition">Giriş Yap</Link>
-          <Link href="/kayit" className="text-xs border border-tusai text-tusai px-3 py-1 rounded hover:bg-tusai-light hover:border-tusai-accent transition">Kayıt Ol</Link>
+          <Link href="/giris" className="text-xs bg-tusai-blue text-white px-3 py-1 rounded hover:bg-tusai-teal transition">Giriş Yap</Link>
+          <Link href="/kayit" className="text-xs border border-tusai-blue text-tusai-blue px-3 py-1 rounded hover:bg-tusai-light hover:border-tusai-teal transition">Kayıt Ol</Link>
         </div>
       </nav>
     );
