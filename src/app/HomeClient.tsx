@@ -53,9 +53,12 @@ export default function HomeClient() {
     <div className="w-full max-w-4xl mx-auto px-4 py-10 flex flex-col gap-16">
       {/* Hero Section */}
       <section className="flex flex-col items-center text-center gap-6 bg-white dark:bg-tusai-dark/80 rounded-xl shadow-lg py-10 px-4 border border-tusai-light dark:border-tusai-dark">
-        <Image src="/logo.svg" alt="TusAI Logo" width={80} height={80} className="mb-2" />
+        <div className="flex items-center gap-3 mb-2">
+          <Image src="/logo.svg" alt="TusAI Logo" width={48} height={48} className="flex-shrink-0" />
+          <span className="font-bold text-2xl text-tusai-dark dark:text-tusai-light">TusAI</span>
+        </div>
         <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-2 text-tusai-blue">
-          Yapay Zeka ile TUS’a Hazırlanmanın Yeni Yolu
+          Yapay Zeka ile TUS&apos;a Hazırlanmanın Yeni Yolu
         </h1>
         <p className="text-lg sm:text-xl text-tusai-dark dark:text-tusai-light max-w-2xl mx-auto mb-4">
           Çıkmış sorular ve akıllı quizlerle sınava daha bilinçli hazırlan. Üstelik tamamen Türkçe, mobil uyumlu ve kullanıcı dostu.
@@ -65,7 +68,7 @@ export default function HomeClient() {
             Ücretsiz Başla
           </Link>
           <a href="/pricing" className="bg-white border border-tusai-blue text-tusai-blue font-semibold px-8 py-3 rounded-lg shadow hover:bg-tusai-light transition text-lg focus:outline-none focus:ring-2 focus:ring-tusai-blue">
-            Premium’a Geç
+            Premium&apos;a Geç
           </a>
         </div>
       </section>

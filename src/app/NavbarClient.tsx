@@ -14,10 +14,10 @@ export default function NavbarClient() {
     return (
       <nav className="w-full flex items-center justify-between px-4 py-2">
         <div className="flex items-center gap-2">
-          <Link href="/">
-            <Image src="/logo.svg" alt="TusAI Logo" width={36} height={36} className="mr-2" />
+          <Link href="/" className="flex items-center gap-2">
+            <Image src="/logo.svg" alt="TusAI Logo" width={32} height={32} className="flex-shrink-0" />
+            <span className="font-bold text-tusai-dark dark:text-tusai-light text-lg">TusAI</span>
           </Link>
-          <span className="font-bold text-tusai-dark dark:text-tusai-light text-lg">TusAI</span>
         </div>
         <div className="flex gap-4 items-center">
           <Link href="/" className="hover:underline text-tusai-dark dark:text-tusai-light">Ana Sayfa</Link>
@@ -36,10 +36,10 @@ export default function NavbarClient() {
   return (
     <nav className="w-full flex items-center justify-between px-4 py-2">
       <div className="flex items-center gap-2">
-        <Link href="/dashboard">
-          <Image src="/logo.svg" alt="TusAI Logo" width={36} height={36} className="mr-2" />
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Image src="/logo.svg" alt="TusAI Logo" width={32} height={32} className="flex-shrink-0" />
+          <span className="font-bold text-tusai-dark dark:text-tusai-light text-lg">TusAI</span>
         </Link>
-        <span className="font-bold text-tusai-dark dark:text-tusai-light text-lg">TusAI</span>
       </div>
       
       {/* Main action - New Quiz */}
