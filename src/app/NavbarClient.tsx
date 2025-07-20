@@ -12,17 +12,32 @@ export default function NavbarClient() {
   // For non-logged in users
   if (!loading && !user) {
     return (
-      <nav className="w-full flex items-center justify-between px-4 py-2">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
+      <nav className="w-full flex items-center justify-between px-6 py-4">
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <Image src="/logo.svg" alt="TusAI Logo" width={32} height={32} className="flex-shrink-0" />
-            <span className="font-bold text-tusai-dark dark:text-tusai-light text-lg">TusAI</span>
+            <span className="font-semibold text-gray-900 dark:text-white text-lg">TusAI</span>
           </Link>
         </div>
-        <div className="flex gap-4 items-center">
-          <Link href="/" className="hover:underline text-tusai-dark dark:text-tusai-light">Ana Sayfa</Link>
-          <Link href="/nasil-calisir" className="hover:underline text-tusai-dark dark:text-tusai-light">Nasıl Çalışır?</Link>
-          <Link href="/pricing" className="hover:underline text-tusai-dark dark:text-tusai-light">Fiyatlandırma</Link>
+        <div className="flex gap-8 items-center">
+          <Link 
+            href="/" 
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+          >
+            Ana Sayfa
+          </Link>
+          <Link 
+            href="/nasil-calisir" 
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+          >
+            Nasıl Çalışır?
+          </Link>
+          <Link 
+            href="/pricing" 
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+          >
+            Fiyatlandırma
+          </Link>
         </div>
         <div className="flex gap-3 items-center">
           <Link 
@@ -44,11 +59,11 @@ export default function NavbarClient() {
 
   // For logged-in users
   return (
-    <nav className="w-full flex items-center justify-between px-4 py-2">
-      <div className="flex items-center gap-2">
-        <Link href="/dashboard" className="flex items-center gap-2">
+    <nav className="w-full flex items-center justify-between px-6 py-4">
+      <div className="flex items-center gap-3">
+        <Link href="/dashboard" className="flex items-center gap-3">
           <Image src="/logo.svg" alt="TusAI Logo" width={32} height={32} className="flex-shrink-0" />
-          <span className="font-bold text-tusai-dark dark:text-tusai-light text-lg">TusAI</span>
+          <span className="font-semibold text-gray-900 dark:text-white text-lg">TusAI</span>
         </Link>
       </div>
       
