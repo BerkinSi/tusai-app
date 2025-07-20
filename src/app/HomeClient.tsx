@@ -17,13 +17,13 @@ const features = [
   },
   {
     icon: CheckCircleIcon,
-    title: "Anında Geri Bildirim",
-    desc: "Cevaplarınızı anında görün, açıklamalarla öğrenin."
+    title: "Akıllı Geri Bildirim",
+    desc: "Cevaplarına göre açıklamalar ve önerilerle rehberlik sağlar."
   },
   {
     icon: ShieldCheckIcon,
-    title: "Güvenilir ve Türkçe",
-    desc: "Tamamen Türkçe arayüz, güvenli ve gizliliğe önem veren platform."
+    title: "Mobil Uyumlu ve Güvenli",
+    desc: "Cihaz fark etmeksizin eriş, kişisel verilerin her zaman güvende kalsın."
   },
 ];
 
