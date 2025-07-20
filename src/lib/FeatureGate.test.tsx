@@ -8,7 +8,7 @@ jest.mock('./AuthContext', () => ({
   useAuth: () => ({ profile: { is_premium: false }, loading: false })
 }));
 
-const { useAuth } = require('./AuthContext');
+import { useAuth } from './AuthContext';
 
 describe('FeatureGate', () => {
   afterEach(() => {
@@ -23,7 +23,8 @@ describe('FeatureGate', () => {
   });
 
   it('renders children for premium', () => {
-    jest.spyOn(require('./AuthContext'), 'useAuth').mockReturnValue({ profile: { is_premium: true }, loading: false });
+    const mockUseAuth = jest.spyOn(require('./AuthContext'), 'useAuth');
+    mockUseAuth.mockReturnValue({ profile: { is_premium: true }, loading: false });
     render(<FeatureGate premium><div>Premium Content</div></FeatureGate>);
     expect(screen.getByText('Premium Content')).toBeInTheDocument();
   });

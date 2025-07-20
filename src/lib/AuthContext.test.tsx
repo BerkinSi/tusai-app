@@ -1,7 +1,7 @@
 jest.mock('@supabase/supabase-js', () => ({
   createClient: () => ({
     auth: {
-      onAuthStateChange: jest.fn((cb) => {
+      onAuthStateChange: jest.fn(() => {
         // Optionally call the callback with nulls to simulate no session
         return { subscription: { unsubscribe: jest.fn() } };
       }),

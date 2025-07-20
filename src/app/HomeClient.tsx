@@ -2,7 +2,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "../lib/AuthContext";
-import FeatureGate from "../lib/FeatureGate";
 import { CheckCircleIcon, LightBulbIcon, AcademicCapIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/24/solid';
 
 const features = [
@@ -47,7 +46,7 @@ const steps = [
 ];
 
 export default function HomeClient() {
-  const { user, profile, loading } = useAuth();
+  const { user: _user, profile: _profile, loading: _loading } = useAuth();
 
   return (
     <div className="w-full max-w-4xl mx-auto px-4 py-10 flex flex-col gap-16">
