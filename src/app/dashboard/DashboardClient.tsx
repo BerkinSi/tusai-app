@@ -6,10 +6,7 @@ import {
   DocumentTextIcon, 
   ClockIcon, 
   CheckCircleIcon,
-  ExclamationTriangleIcon,
-  ArrowTrendingUpIcon,
-  UserIcon,
-  Cog6ToothIcon
+  ArrowTrendingUpIcon
 } from '@heroicons/react/24/outline';
 
 export default function DashboardClient() {
@@ -178,7 +175,7 @@ export default function DashboardClient() {
         <div className="mt-8 bg-gradient-to-r from-tusai-purple to-tusai-blue rounded-lg shadow p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-semibold mb-2">Premium'a Geç</h3>
+                              <h3 className="text-xl font-semibold mb-2">Premium&apos;a Geç</h3>
               <p className="text-white/80 mb-4">
                 Detaylı analizler, geçmiş quizler ve kişiselleştirilmiş öneriler için Premium üyeliğe geçin.
               </p>
@@ -186,7 +183,7 @@ export default function DashboardClient() {
                 href="/pricing"
                 className="bg-white text-tusai-purple font-semibold px-6 py-2 rounded hover:bg-tusai-light transition"
               >
-                Premium'a Geç
+                Premium&apos;a Geç
               </Link>
             </div>
             <div className="hidden sm:block">

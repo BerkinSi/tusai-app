@@ -109,7 +109,7 @@ export default function SettingsClient() {
                   href="/pricing"
                   className="bg-tusai-purple text-white font-semibold px-4 py-2 rounded hover:bg-tusai-blue transition"
                 >
-                  Premium'a Geç
+                  Premium&apos;a Geç
                 </Link>
               )}
             </div>

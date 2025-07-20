@@ -1,15 +1,11 @@
 import Head from "next/head";
 import { 
-  AcademicCapIcon, 
-  CheckCircleIcon, 
-  UserGroupIcon, 
   ChartBarIcon,
   DocumentTextIcon,
   ClockIcon,
   ArrowTrendingUpIcon,
   ExclamationTriangleIcon,
-  Cog6ToothIcon,
-  StarIcon
+  Cog6ToothIcon
 } from '@heroicons/react/24/solid';
 import Image from "next/image";
 import Link from "next/link";
@@ -76,7 +72,7 @@ export default function NasilCalisirPage() {
           <Image src="/logo.svg" alt="TusAI Logo" width={80} height={80} className="mb-2" />
           <h1 className="text-4xl sm:text-5xl font-extrabold text-tusai-blue mb-4">Nasıl Çalışır?</h1>
           <p className="text-xl text-tusai-dark dark:text-tusai-light max-w-3xl mx-auto">
-            TusAI ile TUS'a hazırlık sürecinizde başarıya ulaşmak çok kolay! Kişiselleştirilmiş ve güvenilir bir öğrenme deneyimi sizi bekliyor.
+            TusAI ile TUS&apos;a hazırlık sürecinizde başarıya ulaşmak çok kolay! Kişiselleştirilmiş ve güvenilir bir öğrenme deneyimi sizi bekliyor.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
             <Link href="/kayit" className="bg-tusai-blue text-white font-semibold px-8 py-3 rounded-lg shadow hover:bg-tusai-teal transition">
@@ -173,7 +169,7 @@ export default function NasilCalisirPage() {
           <div className="text-center">
             <h2 className="text-3xl font-bold text-tusai-dark dark:text-tusai-light mb-4">Özellikler</h2>
             <p className="text-tusai-dark/60 dark:text-tusai-light/60">
-              TusAI'nin sunduğu tüm özellikler ve Premium avantajları
+              TusAI&apos;nin sunduğu tüm özellikler ve Premium avantajları
             </p>
           </div>
           
@@ -208,7 +204,7 @@ export default function NasilCalisirPage() {
               Ücretsiz Hesap Oluştur
             </Link>
             <Link href="/pricing" className="border border-white text-white font-semibold px-8 py-3 rounded-lg hover:bg-white/10 transition">
-              Premium'a Geç
+              Premium&apos;a Geç
             </Link>
           </div>
         </section>
