@@ -1,3 +1,22 @@
+jest.mock('@supabase/supabase-js', () => ({
+  createClient: () => ({
+    auth: {
+      onAuthStateChange: jest.fn((cb) => {
+        // Optionally call the callback with nulls to simulate no session
+        return { subscription: { unsubscribe: jest.fn() } };
+      }),
+      getUser: jest.fn(() => Promise.resolve({ data: { user: null } })),
+      signOut: jest.fn(),
+    },
+    from: jest.fn(() => ({
+      select: jest.fn().mockReturnThis(),
+      eq: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({ data: null }),
+      update: jest.fn().mockReturnThis(),
+    })),
+  }),
+}));
+
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { AuthProvider, useAuth } from './AuthContext';

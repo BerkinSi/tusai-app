@@ -15,6 +15,7 @@ export default function NavbarClient() {
       </div>
       <div className="flex gap-4 items-center">
         <Link href="/" className="hover:underline text-tusai-dark dark:text-tusai-light">Ana Sayfa</Link>
+        <Link href="/nasil-calisir" className="hover:underline text-tusai-dark dark:text-tusai-light">Nasıl Çalışır?</Link>
         <Link href="/quiz" className="hover:underline text-tusai-dark dark:text-tusai-light">Quizler</Link>
         <Link href="/pricing" className="hover:underline text-tusai-dark dark:text-tusai-light">Fiyatlandırma</Link>
       </div>

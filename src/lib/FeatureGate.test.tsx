@@ -3,12 +3,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import FeatureGate from './FeatureGate';
 import React from 'react';
 
-// Mock useAuth
+// Default mock for useAuth (non-premium)
 jest.mock('./AuthContext', () => ({
   useAuth: () => ({ profile: { is_premium: false }, loading: false })
 }));
 
+const { useAuth } = require('./AuthContext');
+
 describe('FeatureGate', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('shows upgrade modal for non-premium', () => {
     render(<FeatureGate premium><div>Premium Content</div></FeatureGate>);
     fireEvent.click(screen.getByText(/Premium Özellik/i));
@@ -17,7 +23,7 @@ describe('FeatureGate', () => {
   });
 
   it('renders children for premium', () => {
-    jest.mocked(require('./AuthContext').useAuth).mockReturnValue({ profile: { is_premium: true }, loading: false });
+    jest.spyOn(require('./AuthContext'), 'useAuth').mockReturnValue({ profile: { is_premium: true }, loading: false });
     render(<FeatureGate premium><div>Premium Content</div></FeatureGate>);
     expect(screen.getByText('Premium Content')).toBeInTheDocument();
   });
