@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../../lib/AuthContext";
-import { AcademicCapIcon, CheckCircleIcon, FireIcon, ArrowPathIcon, StarIcon, DocumentTextIcon, MagnifyingGlassIcon, TagIcon, BookmarkIcon, SparklesIcon } from '@heroicons/react/24/solid';
+import { AcademicCapIcon, CheckCircleIcon, FireIcon, ArrowPathIcon, StarIcon, DocumentTextIcon, BookmarkIcon, SparklesIcon } from '@heroicons/react/24/solid';
 
 // Dummy data for demonstration
 const dummyPerformance = {
@@ -23,7 +23,7 @@ const dummyPerformance = {
 
 const dummyHistory = [
   { id: 1, date: "2024-07-20", subject: "Fizyoloji", score: 60, type: "AI", mistakes: 4 },
-  { id: 2, date: "2024-07-18", subject: "Biyokimya", score: 85, type: "Sınav Tipi", mistakes: 1 },
+  { id: 2, date: "2024-07-18", subject: "Biyokimya", score: 85, type: "Çıkmış", mistakes: 1 },
   { id: 3, date: "2024-07-15", subject: "Patoloji", score: 55, type: "Karma", mistakes: 5 },
 ];
 
@@ -38,18 +38,6 @@ const leaderboardPreview = {
   rank: 113,
   insight: "Farmakoloji'de 4800 kullanıcı arasında 113. sıradasın!"
 };
-
-function FeatureGate({ premium, children }: { premium: boolean; children: React.ReactNode }) {
-  const { profile } = useAuth();
-  if (premium && !profile?.is_premium) {
-    return (
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4 text-yellow-800 dark:text-yellow-200 text-sm text-center my-2">
-        Bu özellik <b>Premium</b> üyeler için. <Link href="/pricing" className="underline text-blue-600">Yükselt</Link>
-      </div>
-    );
-  }
-  return <>{children}</>;
-}
 
 export default function DashboardPage() {
   const { profile } = useAuth();
@@ -77,7 +65,7 @@ export default function DashboardPage() {
           <FireIcon className="w-5 h-5" /> Zayıf Konulardan Quiz
         </button>
         <button className="flex-1 flex items-center gap-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg px-4 py-3 font-medium text-green-700 dark:text-green-200 hover:bg-green-100 dark:hover:bg-green-900 transition">
-          <CheckCircleIcon className="w-5 h-5" /> Son Quiz'e Devam Et
+          <CheckCircleIcon className="w-5 h-5" /> Son Quiz&apos;e Devam Et
         </button>
       </section>
 
@@ -96,7 +84,6 @@ export default function DashboardPage() {
           <div className="text-gray-700 dark:text-gray-300 text-sm">Günlük Quiz Serisi</div>
         </div>
       </section>
-
       {/* Chart Placeholder */}
       <section className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <h2 className="text-lg font-semibold mb-2 text-blue-600">Konu Bazlı Doğruluk (Son 10 Quiz)</h2>
@@ -164,7 +151,7 @@ export default function DashboardPage() {
             <select className="border rounded px-2 py-1 text-sm">
               <option>Quiz Tipi</option>
               <option>AI</option>
-              <option>Sınav tipi</option>
+              <option>Çıkmış</option>
               <option>Karma</option>
             </select>
             <select className="border rounded px-2 py-1 text-sm">
@@ -230,7 +217,7 @@ export default function DashboardPage() {
             <div key={note.id} className="mb-4 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
               <div className="flex items-center gap-2 mb-1">
                 <span className="font-semibold text-gray-900 dark:text-white">{note.title}</span>
-                {note.pinned && <TagIcon className="w-4 h-4 text-yellow-500" title="Pinlenmiş" />}
+                {/* Pin icon can be added here if needed */}
                 {note.tags.map(tag => (
                   <span key={tag} className="ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 px-2 py-0.5 rounded">{tag}</span>
                 ))}
