@@ -17,6 +17,8 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  signUpWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,17 +32,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id);
+        await handleUserProfile(session.user);
       } else {
         setProfile(null);
       }
     });
 
     // Initial load
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       setUser(data.user ?? null);
       if (data.user) {
-        fetchProfile(data.user.id);
+        await handleUserProfile(data.user);
       } else {
         setLoading(false);
       }
@@ -52,6 +54,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
   }, []);
+
+  const handleUserProfile = async (user: User) => {
+    setLoading(true);
+    
+    // Check if profile exists
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (!existingProfile) {
+      // Create profile for new users (especially OAuth users)
+      const { data: newProfile } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          full_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0],
+          avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
+          is_premium: false,
+        })
+        .select()
+        .single();
+      
+      setProfile(newProfile);
+    } else {
+      setProfile(existingProfile);
+    }
+    
+    setLoading(false);
+  };
 
   const fetchProfile = async (userId: string) => {
     setLoading(true);
@@ -70,8 +103,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setProfile(null);
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    });
+    if (error) {
+      console.error('Google sign in error:', error);
+    }
+  };
+
+  const signUpWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`
+      }
+    });
+    if (error) {
+      console.error('Google sign up error:', error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ user, profile, loading, signOut, signInWithGoogle, signUpWithGoogle }}>
       {children}
     </AuthContext.Provider>
   );
