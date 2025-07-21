@@ -60,7 +60,7 @@ describe('AuthContext', () => {
   });
 
   it('calls signInWithGoogle with correct params', async () => {
-    const { createClient, __mocks } = jest.requireMock('@supabase/supabase-js');
+    const { __mocks } = jest.requireMock('@supabase/supabase-js');
     render(
       <AuthProvider>
         <TestComponent />
@@ -76,7 +76,7 @@ describe('AuthContext', () => {
   });
 
   it('calls signUpWithGoogle with correct params', async () => {
-    const { createClient, __mocks } = jest.requireMock('@supabase/supabase-js');
+    const { __mocks } = jest.requireMock('@supabase/supabase-js');
     render(
       <AuthProvider>
         <TestComponent />
@@ -92,7 +92,7 @@ describe('AuthContext', () => {
   });
 
   it('calls signOut and resets state', async () => {
-    const { createClient, __mocks } = jest.requireMock('@supabase/supabase-js');
+    const { __mocks } = jest.requireMock('@supabase/supabase-js');
     render(
       <AuthProvider>
         <TestComponent />
@@ -106,7 +106,7 @@ describe('AuthContext', () => {
 
   it('creates profile for OAuth user if not exists', async () => {
     // Mock a user returned from getUser
-    const { createClient, __mocks } = jest.requireMock('@supabase/supabase-js');
+    const { __mocks } = jest.requireMock('@supabase/supabase-js');
     __mocks.getUser.mockResolvedValueOnce({ data: { user: { id: '123', email: 'test@example.com', user_metadata: { name: 'Test User' } } } });
     // Mock no existing profile
     __mocks.from().select().eq().single.mockResolvedValueOnce({ data: null });

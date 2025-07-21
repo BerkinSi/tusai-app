@@ -2,12 +2,15 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import GirisPage from './page';
 import React from 'react';
+import { useAuth } from '../../lib/AuthContext';
+import { supabase } from '../../lib/supabaseClient';
+import { useRouter } from 'next/navigation';
 
 jest.mock('../../lib/AuthContext', () => {
   return {
-    useAuth: () => ({
+    useAuth: jest.fn(() => ({
       signInWithGoogle: jest.fn(() => Promise.resolve()),
-    }),
+    })),
   };
 });
 
@@ -22,7 +25,7 @@ jest.mock('../../lib/supabaseClient', () => {
 });
 
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn() }),
+  useRouter: jest.fn(() => ({ push: jest.fn() })),
 }));
 
 describe('GirisPage', () => {
@@ -35,7 +38,6 @@ describe('GirisPage', () => {
   });
 
   it('calls Supabase on email/password login', async () => {
-    const { supabase } = require('../../lib/supabaseClient');
     render(<GirisPage />);
     fireEvent.change(screen.getByLabelText(/E-posta/i), { target: { value: 'test@example.com' } });
     fireEvent.change(screen.getByLabelText(/Şifre/i), { target: { value: 'password123' } });
@@ -46,8 +48,7 @@ describe('GirisPage', () => {
   });
 
   it('shows error on failed login', async () => {
-    const { supabase } = require('../../lib/supabaseClient');
-    supabase.auth.signInWithPassword.mockResolvedValueOnce({ error: { message: 'fail' } });
+    (supabase.auth.signInWithPassword as jest.Mock).mockResolvedValueOnce({ error: { message: 'fail' } });
     render(<GirisPage />);
     fireEvent.change(screen.getByLabelText(/E-posta/i), { target: { value: 'fail@example.com' } });
     fireEvent.change(screen.getByLabelText(/Şifre/i), { target: { value: 'wrong' } });
@@ -58,7 +59,6 @@ describe('GirisPage', () => {
   });
 
   it('calls signInWithGoogle on Google button click', async () => {
-    const { useAuth } = require('../../lib/AuthContext');
     render(<GirisPage />);
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /Google ile Giriş Yap/i }));

@@ -105,7 +105,7 @@ export default function SSSPage() {
         <section key={group.category} className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-4">
           <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">{group.category}</h2>
           <div>
-            {group.questions.map((item, idx) => (
+            {group.questions.map((item) => (
               <Accordion key={item.q} question={item.q} answer={item.a} />
             ))}
           </div>
