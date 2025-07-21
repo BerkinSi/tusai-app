@@ -47,7 +47,7 @@ export default function KayitPage() {
     setError(null);
     try {
       await signUpWithGoogle();
-    } catch (error) {
+    } catch {
       setError("Google ile kayıt başarısız. Lütfen tekrar deneyin.");
     } finally {
       setGoogleLoading(false);

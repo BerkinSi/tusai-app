@@ -33,7 +33,7 @@ export default function GirisPage() {
     setError(null);
     try {
       await signInWithGoogle();
-    } catch (error) {
+    } catch {
       setError("Google ile giriş başarısız. Lütfen tekrar deneyin.");
     } finally {
       setGoogleLoading(false);

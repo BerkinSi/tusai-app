@@ -86,17 +86,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setLoading(false);
   };
 
-  const fetchProfile = async (userId: string) => {
-    setLoading(true);
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-    setProfile(data ?? null);
-    setLoading(false);
-  };
-
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
