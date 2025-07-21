@@ -112,17 +112,6 @@ export default function NavbarClient() {
         </Link>
       </div>
       
-      {/* Main action - New Quiz */}
-      <div className="flex-1 flex justify-center">
-        <Link 
-          href="/quiz/new" 
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200 flex items-center gap-2"
-        >
-          <DocumentTextIcon className="w-4 h-4" />
-          Yeni Quiz Oluştur
-        </Link>
-      </div>
-
       {/* Hamburger menu */}
       <div className="relative">
         <button

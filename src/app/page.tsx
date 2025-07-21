@@ -1,5 +1,10 @@
 import HomeClient from "./HomeClient";
+import AuthRedirector from "./AuthRedirector";
 
 export default function HomePage() {
-  return <HomeClient />;
+  return (
+    <AuthRedirector>
+      <HomeClient />
+    </AuthRedirector>
+  );
 }

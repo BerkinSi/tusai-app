@@ -7,11 +7,11 @@ const FAQ_DATA = [
     questions: [
       {
         q: "TusAI nedir?",
-        a: "TusAI, Tıpta Uzmanlık Sınavı (TUS) için yapay zeka destekli, interaktif bir quiz platformudur. Gerçek çıkmış soruları ve yapay zekâ tarafından oluşturulan soruları kullanarak kişiselleştirilmiş testler sunar."
+        a: "TusAI, Tıpta Uzmanlık Sınavı (TUS) için yapay zeka destekli, interaktif bir quiz platformudur. Sınav tipi soruları ve yapay zekâ tarafından oluşturulan soruları kullanarak kişiselleştirilmiş testler sunar."
       },
       {
         q: "Platformdaki sorular nasıl hazırlanıyor?",
-        a: "Gerçek çıkmış TUS soruları, geçmiş sorulara benzeyen AI üretimi sorular ve tamamen yeni AI sorularıyla hazırlanır."
+        a: "Sınav Tipi TUS soruları, geçmiş sorulara benzeyen AI üretimi sorular ve tamamen yeni AI sorularıyla hazırlanır."
       },
       {
         q: "TusAI'de hangi dersler kapsanıyor?",

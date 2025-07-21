@@ -90,13 +90,13 @@ export default function QuizPage() {
                 className={`px-4 py-2 rounded font-semibold border ${quizType === "cikmis" ? "bg-tusai text-white" : "border-tusai text-tusai bg-tusai-light hover:bg-tusai-accent/10"}`}
                 onClick={() => setQuizType("cikmis")}
               >
-                Çıkmış Sorular
+                Sınav Tipi Sorular
               </button>
               <button
                 className={`px-4 py-2 rounded font-semibold border ${quizType === "karisik" ? "bg-tusai text-white" : "border-tusai text-tusai bg-tusai-light hover:bg-tusai-accent/10"}`}
                 onClick={() => setQuizType("karisik")}
               >
-                Karışık (AI + Gerçek)
+                Karışık (AI + Sınav Tipi)
               </button>
             </div>
             {quizType && (
@@ -170,7 +170,7 @@ export default function QuizPage() {
               <ul className="space-y-2">
                 {history.slice().reverse().map((h, i) => (
                   <li key={i} className="border border-tusai rounded p-3 flex flex-col sm:flex-row sm:items-center sm:justify-between bg-tusai-light/40 dark:bg-tusai-dark/40">
-                    <span className="font-semibold">{new Date(h.date).toLocaleDateString("tr-TR")} - {h.type === "cikmis" ? "Çıkmış Sorular" : "Karışık"}</span>
+                    <span className="font-semibold">{new Date(h.date).toLocaleDateString("tr-TR")} - {h.type === "cikmis" ? "Sınav Tipi Sorular" : "Karışık"}</span>
                     <span className="text-tusai-accent font-bold">Skor: {h.score} / {h.total}</span>
                   </li>
                 ))}
