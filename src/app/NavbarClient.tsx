@@ -9,6 +9,14 @@ export default function NavbarClient() {
   const { user, profile, signOut, loading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Responsive breakpoint
+  const navLinks = [
+    { href: "/", label: "Ana Sayfa" },
+    { href: "/nasil-calisir", label: "Nasıl Çalışır?" },
+    { href: "/sss", label: "SSS" },
+    { href: "/pricing", label: "Fiyatlandırma" },
+  ];
+
   // For non-logged in users
   if (!loading && !user) {
     return (
@@ -19,39 +27,76 @@ export default function NavbarClient() {
             <span className="font-semibold text-gray-900 dark:text-white text-lg">TusAI</span>
           </Link>
         </div>
-        <div className="flex gap-8 items-center">
-          <Link 
-            href="/" 
-            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-          >
-            Ana Sayfa
-          </Link>
-          <Link 
-            href="/nasil-calisir" 
-            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-          >
-            Nasıl Çalışır?
-          </Link>
-          <Link 
-            href="/pricing" 
-            className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-          >
-            Fiyatlandırma
-          </Link>
+        {/* Desktop links */}
+        <div className="hidden md:flex gap-8 items-center">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
-        <div className="flex gap-3 items-center">
-          <Link 
-            href="/giris" 
+        <div className="hidden md:flex gap-3 items-center">
+          <Link
+            href="/giris"
             className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
           >
             Giriş Yap
           </Link>
-          <Link 
-            href="/kayit" 
+          <Link
+            href="/kayit"
             className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-sm hover:shadow-md transition-all duration-200 font-medium"
           >
             Kayıt Ol
           </Link>
+        </div>
+        {/* Hamburger for mobile */}
+        <div className="md:hidden relative">
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+            aria-label="Menüyü Aç/Kapat"
+          >
+            {isMenuOpen ? (
+              <XMarkIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            ) : (
+              <Bars3Icon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            )}
+          </button>
+          {isMenuOpen && (
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+              <div className="flex flex-col gap-1 p-4">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
+                <Link
+                  href="/giris"
+                  className="px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Giriş Yap
+                </Link>
+                <Link
+                  href="/kayit"
+                  className="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-center font-medium"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Kayıt Ol
+                </Link>
+              </div>
+            </div>
+          )}
         </div>
       </nav>
     );

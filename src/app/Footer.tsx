@@ -18,8 +18,8 @@ export default function Footer() {
             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <span>© {new Date().getFullYear()} TusAI</span>
               <span>•</span>
-              <a href="mailto:destek@tusai.app" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                destek@tusai.app
+              <a href="mailto:support@tusai.app" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                support@tusai.app
               </a>
             </div>
           </div>
