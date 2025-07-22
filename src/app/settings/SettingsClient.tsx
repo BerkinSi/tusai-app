@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { 
   UserIcon, 
   Cog6ToothIcon, 
-  CreditCardIcon,
   SunIcon,
   MoonIcon,
   CheckCircleIcon,
@@ -29,20 +28,6 @@ export default function SettingsClient() {
     }
   }, [user, router]);
 
-  // Show loading or redirect if not authenticated
-  if (!user) {
-    return (
-      <div className="w-full max-w-4xl mx-auto px-4 py-8">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 dark:text-gray-400">Yönlendiriliyor...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Initialize dark mode from localStorage
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
@@ -56,6 +41,20 @@ export default function SettingsClient() {
       document.documentElement.classList.remove('dark');
     }
   }, []);
+
+  // Show loading or redirect if not authenticated
+  if (!user) {
+    return (
+      <div className="w-full max-w-4xl mx-auto px-4 py-8">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Yönlendiriliyor...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;

@@ -4,7 +4,7 @@ import GirisPage from './page';
 import React from 'react';
 import { useAuth } from '../../lib/AuthContext';
 import { supabase } from '../../lib/supabaseClient';
-import { useRouter } from 'next/navigation';
+
 
 jest.mock('../../lib/AuthContext', () => {
   return {

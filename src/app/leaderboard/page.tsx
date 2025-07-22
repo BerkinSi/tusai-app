@@ -33,18 +33,14 @@ const currentUser = {
   motivational: "3 kişi geçmek için 8 doğru cevap daha çözmen yeterli. %3’lük dilimdesin, bu harika!"
 };
 
-const SORT_COLUMNS = [
-  { key: "correct", label: "Doğru Sayısı" },
-  { key: "solved", label: "Çözülen Soru" },
-  { key: "accuracy", label: "Doğruluk (%)" },
-];
+
 
 export default function LeaderboardPage() {
   const { profile } = useAuth();
   const [subject, setSubject] = useState("Fizyoloji");
   const [sortBy, setSortBy] = useState("correct");
   const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
-  const [userInTop, setUserInTop] = useState(false); // For mock, user not in top 20
+  const [userInTop] = useState(false); // For mock, user not in top 20
   const userRowRef = useRef<HTMLTableRowElement>(null);
 
   // Empty state: user not in leaderboard for this subject

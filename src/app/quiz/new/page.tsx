@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../../lib/AuthContext";
 import jsPDF from "jspdf";
@@ -33,7 +33,7 @@ const MODE_DESCRIPTIONS: Record<string, string> = {
   cikmis: "ÖSYM tarafından yayımlanmış geçmiş sınav sorularından oluşur"
 };
 
-export default function QuizNewPage() {
+function QuizNewPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, profile, loading } = useAuth();
@@ -136,7 +136,7 @@ export default function QuizNewPage() {
       // TODO: Store quiz session in Supabase
       setCreatedQuizId(quiz_id); // Save for next step
       setStep(4); // Go to final options step
-    } catch (e) {
+    } catch {
       setError("Quiz oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
     } finally {
       setCreating(false);
@@ -258,6 +258,14 @@ export default function QuizNewPage() {
     }
   }
 
+  // Main wizard UI
+  useEffect(() => {
+    if (step === 3 && !creating) {
+      handleCreateQuiz();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
   // Edge: Free user daily limit
   if (!loading && user && !canCreateQuiz) {
     return (
@@ -271,13 +279,7 @@ export default function QuizNewPage() {
     );
   }
 
-  // Main wizard UI
-  useEffect(() => {
-    if (step === 3 && !creating) {
-      handleCreateQuiz();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step]);
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-tusai-light dark:bg-tusai-dark py-8 px-2">
@@ -427,5 +429,20 @@ export default function QuizNewPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function QuizNewPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center bg-tusai-light dark:bg-tusai-dark py-8 px-2">
+        <div className="w-full max-w-lg bg-white dark:bg-tusai-dark border border-tusai rounded-lg shadow-lg p-6 sm:p-8 flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-tusai-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="text-tusai-accent font-medium">Yükleniyor...</div>
+        </div>
+      </div>
+    }>
+      <QuizNewPageContent />
+    </Suspense>
   );
 } 

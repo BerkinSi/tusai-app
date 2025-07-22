@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../../../../lib/AuthContext";
 import { useEffect, useState } from "react";
 import jsPDF from "jspdf";
@@ -48,7 +48,7 @@ const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 export default function QuizResultPage() {
   const { profile } = useAuth();
   const router = useRouter();
-  const params = useParams();
+
   // const quizId = params.id; // TODO: fetch real data
   const result = MOCK_RESULT;
   const isPremium = !!profile?.is_premium;
@@ -110,7 +110,7 @@ export default function QuizResultPage() {
       doc.text("Konu Bazlı Doğruluk", 15, y);
       y += 8;
       
-      result.subjectStats.forEach((stat, index) => {
+      result.subjectStats.forEach((stat) => {
         const accuracy = Math.round((stat.correct / stat.total) * 100);
         const barWidth = (stat.correct / stat.total) * 80; // Max 80 units wide
         
@@ -235,8 +235,7 @@ export default function QuizResultPage() {
     return `${m}:${s.toString().padStart(2, "0")}`;
   }
 
-  // Calculate subject-wise accuracy for bar chart
-  const maxSubjectTotal = Math.max(...result.subjectStats.map(s => s.total));
+
 
   return (
     <div className="min-h-screen bg-tusai-light">
@@ -385,7 +384,7 @@ export default function QuizResultPage() {
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                           </svg>
-                          Daha fazla açıklama görmek için Premium'a geçin.
+                          Daha fazla açıklama görmek için Premium&apos;a geçin.
                         </div>
                       )}
                     </div>
@@ -398,7 +397,7 @@ export default function QuizResultPage() {
             {!isPremium && (
               <div className="bg-gradient-to-r from-tusai-accent/10 to-tusai/10 rounded-lg p-6 border border-tusai-accent/20">
                 <div className="text-center">
-                  <div className="font-semibold text-tusai-accent mb-3">Daha fazlası için Premium'a geçin!</div>
+                  <div className="font-semibold text-tusai-accent mb-3">Daha fazlası için Premium&apos;a geçin!</div>
                   <ul className="text-sm text-tusai-dark mb-4 space-y-1">
                     <li>• Tüm açıklamalara erişim</li>
                     <li>• Quiz sonuçlarını PDF olarak dışa aktar</li>
@@ -409,7 +408,7 @@ export default function QuizResultPage() {
                     className="bg-tusai-accent text-white px-8 py-3 rounded-lg font-semibold hover:bg-tusai transition shadow-lg hover:shadow-xl" 
                     onClick={() => router.push("/pricing")}
                   >
-                    Premium'a Geç
+                    Premium&apos;a Geç
                   </button>
                 </div>
               </div>

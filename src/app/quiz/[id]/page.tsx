@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useRouter } from "next/navigation";
 // import { getQuizById, submitQuizAnswers } from "../../../lib/quizApi"; // TODO: implement real fetch/submit
 
 // Placeholder quiz data structure
@@ -40,7 +40,7 @@ const OPTION_LABELS = ["A", "B", "C", "D", "E"];
 
 export default function QuizTakePage() {
   const router = useRouter();
-  const params = useParams();
+
   // const quizId = params.id; // TODO: use for real fetch
   const quiz = MOCK_QUIZ; // TODO: fetch real quiz by id
 
@@ -49,6 +49,12 @@ export default function QuizTakePage() {
   const [timer, setTimer] = useState<number | null>(quiz.timer ? quiz.timer * 60 : null); // seconds
   const [isTabActive, setIsTabActive] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Finish/submit
+  const handleFinish = useCallback(() => {
+    // TODO: submitQuizAnswers(quiz.id, answers)
+    router.replace(`/quiz/${quiz.id}/result`);
+  }, [router, quiz.id]);
 
   // Timer logic
   useEffect(() => {
@@ -60,7 +66,7 @@ export default function QuizTakePage() {
     }
     timerRef.current = setTimeout(() => setTimer((t) => (t !== null ? t - 1 : null)), 1000);
     return () => clearTimeout(timerRef.current!);
-  }, [timer, isTabActive]);
+  }, [timer, isTabActive, handleFinish]);
 
   // Pause timer if tab is inactive
   useEffect(() => {
@@ -87,12 +93,6 @@ export default function QuizTakePage() {
   }
   function goTo(idx: number) {
     setCurrent(idx);
-  }
-
-  // Finish/submit
-  function handleFinish() {
-    // TODO: submitQuizAnswers(quiz.id, answers)
-    router.replace(`/quiz/${quiz.id}/result`);
   }
 
   // Progress bar

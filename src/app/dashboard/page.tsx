@@ -49,7 +49,7 @@ export default function DashboardPage() {
   // TODO: Replace with real daily limit logic
   const quizLimit = profile?.is_premium ? 5 : 1;
   const quizCountToday = 0; // TODO: fetch from Supabase
-  const canCreateQuiz = quizCountToday < quizLimit;
+
 
   // Check for ongoing quiz (dummy logic - replace with real data)
   const hasOngoingQuiz = false; // TODO: Check from Supabase
@@ -181,7 +181,7 @@ export default function DashboardPage() {
                       className="text-xs bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full font-medium hover:from-purple-600 hover:to-pink-600 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                       aria-label="Upgrade to premium for more daily quizzes"
                     >
-                      Premium'a Geç
+                      Premium&apos;a Geç
                     </Link>
                   )}
                 </div>
