@@ -14,5 +14,8 @@ export default function AuthRedirector({ children }: { children: React.ReactNode
     }
   }, [user, loading, pathname, router]);
 
+  // Show nothing while loading, and never show children if user is logged in
+  if (loading || user) return null;
+
   return <>{children}</>;
 } 
