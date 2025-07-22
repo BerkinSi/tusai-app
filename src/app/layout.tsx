@@ -34,10 +34,11 @@ export default function RootLayout({
       </Head>
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-tusai-light dark:bg-tusai-dark text-tusai-dark dark:text-tusai-light`}>
         <AuthProvider>
-          <header className="sticky top-0 z-50 bg-white/95 dark:bg-tusai-dark/95 shadow-md border-b border-tusai-light dark:border-tusai-dark">
+          {/* Non-sticky header */}
+          <header className="bg-white/95 dark:bg-tusai-dark/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 shadow-sm">
             <NavbarClient />
           </header>
-          <main className="min-h-[80vh] flex flex-col items-center justify-center w-full">
+          <main className="min-h-screen">
             {children}
           </main>
           <Footer />
