@@ -1,8 +1,11 @@
 "use client";
 
+import BackButton from '../../components/BackButton';
+
 export default function IletisimPage() {
   return (
     <div className="w-full max-w-xl mx-auto px-4 py-12 flex flex-col gap-8">
+      <BackButton className="mb-4" />
       <h1 className="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-8">İletişim</h1>
       <section className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
         <p className="mb-4 text-gray-700 dark:text-gray-300">

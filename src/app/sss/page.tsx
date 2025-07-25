@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import BackButton from '../../components/BackButton';
 
 const FAQ_DATA = [
   {
@@ -100,6 +101,7 @@ function Accordion({ question, answer }: { question: string; answer: string }) {
 export default function SSSPage() {
   return (
     <div className="w-full max-w-2xl mx-auto px-4 py-12 flex flex-col gap-10">
+      <BackButton className="mb-4" />
       <h1 className="text-3xl sm:text-4xl font-bold text-center text-blue-600 mb-8">Sıkça Sorulan Sorular (SSS)</h1>
       {FAQ_DATA.map((group) => (
         <section key={group.category} className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-4">

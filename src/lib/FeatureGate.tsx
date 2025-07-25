@@ -9,10 +9,14 @@ interface FeatureGateProps {
 }
 
 export default function FeatureGate({ premium, children }: FeatureGateProps) {
-  const { profile, loading } = useAuth();
+  const { profile, authState } = useAuth();
   const [showModal, setShowModal] = useState(false);
 
-  if (loading) return null;
+  if (authState === "loading") return (
+    <div className="w-full flex justify-center items-center py-12">
+      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
 
   if (premium && !profile?.is_premium) {
     return (

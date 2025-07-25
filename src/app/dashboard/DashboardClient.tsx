@@ -1,6 +1,8 @@
 "use client";
 import { useAuth } from '../../lib/AuthContext';
+import { quizzesApi, Quiz } from '../../lib/api';
 import Link from 'next/link';
+import { useEffect, useState, useMemo } from 'react';
 import { 
   ChartBarIcon, 
   DocumentTextIcon, 
@@ -11,28 +13,92 @@ import {
 
 export default function DashboardClient() {
   const { user, profile } = useAuth();
+  const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - in real app, this would come from API
-  const stats = {
-    totalQuizzes: 24,
-    correctAnswers: 156,
-    totalQuestions: 240,
-    averageScore: 65,
-    streakDays: 7,
-    timeSpent: '12h 30m'
+  useEffect(() => {
+    if (user?.id) {
+      loadQuizzes();
+    }
+  }, [user]);
+
+  const loadQuizzes = async () => {
+    if (!user?.id) return;
+    
+    setLoading(true);
+    try {
+      const response = await quizzesApi.getQuizzes({ limit: 10 });
+      if (response.data) {
+        setQuizzes(response.data);
+      } else {
+        console.error('Failed to load quizzes:', response.error);
+      }
+    } catch (error) {
+      console.error('Error loading quizzes:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const recentQuizzes = [
-    { id: 1, title: 'Anatomi Quiz #12', score: 85, date: '2024-01-20', questions: 20 },
-    { id: 2, title: 'Fizyoloji Quiz #8', score: 72, date: '2024-01-19', questions: 15 },
-    { id: 3, title: 'Biokimya Quiz #5', score: 68, date: '2024-01-18', questions: 18 },
-  ];
+  // Calculate stats from real data
+  const stats = {
+    totalQuizzes: quizzes.length,
+    correctAnswers: quizzes.reduce((sum, q) => sum + (q.correct_count || 0), 0),
+    totalQuestions: quizzes.reduce((sum, q) => sum + (q.total_questions || 0), 0),
+    averageScore: quizzes.length ? Math.round(quizzes.reduce((sum, q) => sum + (q.score || 0), 0) / quizzes.length) : 0,
+    streakDays: 7, // This would need a separate calculation
+    timeSpent: '12h 30m' // This would need a separate calculation
+  };
 
-  const weakAreas = [
-    { subject: 'Kardiyoloji', accuracy: 45, questions: 12 },
-    { subject: 'Nöroloji', accuracy: 52, questions: 8 },
-    { subject: 'Endokrinoloji', accuracy: 58, questions: 15 },
-  ];
+  // Get recent quizzes (last 3)
+  const recentQuizzes = quizzes.slice(0, 3).map(quiz => ({
+    id: quiz.id,
+    title: `${quiz.subjects?.[0] || 'Quiz'} #${quiz.id.slice(-4)}`,
+    score: quiz.score || 0,
+    date: new Date(quiz.created_at).toLocaleDateString('tr-TR'),
+    questions: quiz.total_questions || 0
+  }));
+
+  // Calculate weak areas based on quiz data
+  const weakAreas = useMemo(() => {
+    const subjectStats: Record<string, { total: number; correct: number; count: number }> = {};
+    
+    quizzes.forEach(quiz => {
+      quiz.subjects?.forEach(subject => {
+        if (!subjectStats[subject]) {
+          subjectStats[subject] = { total: 0, correct: 0, count: 0 };
+        }
+        subjectStats[subject].total += quiz.total_questions || 0;
+        subjectStats[subject].correct += quiz.correct_count || 0;
+        subjectStats[subject].count += 1;
+      });
+    });
+
+    return Object.entries(subjectStats)
+      .map(([subject, stats]) => ({
+        subject,
+        accuracy: stats.total ? Math.round((stats.correct / stats.total) * 100) : 0,
+        questions: stats.total
+      }))
+      .sort((a, b) => a.accuracy - b.accuracy)
+      .slice(0, 3);
+  }, [quizzes]);
+
+  if (loading) {
+    return (
+      <div className="w-full max-w-6xl mx-auto px-4 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded mb-8"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="bg-gray-200 rounded-lg h-24"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 py-8">
@@ -117,20 +183,26 @@ export default function DashboardClient() {
             <h2 className="text-xl font-semibold text-tusai-dark dark:text-tusai-light">Son Quizler</h2>
           </div>
           <div className="p-6">
-            {recentQuizzes.map((quiz) => (
-              <div key={quiz.id} className="flex items-center justify-between py-3 border-b border-tusai-light dark:border-tusai-dark last:border-b-0">
-                <div>
-                  <p className="font-medium text-tusai-dark dark:text-tusai-light">{quiz.title}</p>
-                  <p className="text-sm text-tusai-dark/60 dark:text-tusai-light/60">
-                    {quiz.date} • {quiz.questions} soru
-                  </p>
+            {recentQuizzes.length > 0 ? (
+              recentQuizzes.map((quiz) => (
+                <div key={quiz.id} className="flex items-center justify-between py-3 border-b border-tusai-light dark:border-tusai-dark last:border-b-0">
+                  <div>
+                    <p className="font-medium text-tusai-dark dark:text-tusai-light">{quiz.title}</p>
+                    <p className="text-sm text-tusai-dark/60 dark:text-tusai-light/60">
+                      {quiz.date} • {quiz.questions} soru
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-tusai-dark dark:text-tusai-light">%{quiz.score}</p>
+                    <p className="text-xs text-tusai-dark/60 dark:text-tusai-light/60">Skor</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold text-tusai-dark dark:text-tusai-light">%{quiz.score}</p>
-                  <p className="text-xs text-tusai-dark/60 dark:text-tusai-light/60">Skor</p>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                Henüz quiz çözülmemiş
               </div>
-            ))}
+            )}
             <Link 
               href="/quiz/history"
               className="mt-4 text-tusai-blue hover:text-tusai-teal text-sm font-medium"
@@ -146,20 +218,26 @@ export default function DashboardClient() {
             <h2 className="text-xl font-semibold text-tusai-dark dark:text-tusai-light">Geliştirilmesi Gereken Alanlar</h2>
           </div>
           <div className="p-6">
-            {weakAreas.map((area, index) => (
-              <div key={index} className="flex items-center justify-between py-3 border-b border-tusai-light dark:border-tusai-dark last:border-b-0">
-                <div>
-                  <p className="font-medium text-tusai-dark dark:text-tusai-light">{area.subject}</p>
-                  <p className="text-sm text-tusai-dark/60 dark:text-tusai-light/60">
-                    {area.questions} soru çözüldü
-                  </p>
+            {weakAreas.length > 0 ? (
+              weakAreas.map((area, index) => (
+                <div key={index} className="flex items-center justify-between py-3 border-b border-tusai-light dark:border-tusai-dark last:border-b-0">
+                  <div>
+                    <p className="font-medium text-tusai-dark dark:text-tusai-light">{area.subject}</p>
+                    <p className="text-sm text-tusai-dark/60 dark:text-tusai-light/60">
+                      {area.questions} soru çözüldü
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-tusai-error">%{area.accuracy}</p>
+                    <p className="text-xs text-tusai-dark/60 dark:text-tusai-light/60">Doğruluk</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-semibold text-tusai-error">%{area.accuracy}</p>
-                  <p className="text-xs text-tusai-dark/60 dark:text-tusai-light/60">Doğruluk</p>
-                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                Henüz yeterli veri yok
               </div>
-            ))}
+            )}
             <Link 
               href="/analysis"
               className="mt-4 text-tusai-blue hover:text-tusai-teal text-sm font-medium"
@@ -175,7 +253,7 @@ export default function DashboardClient() {
         <div className="mt-8 bg-gradient-to-r from-tusai-purple to-tusai-blue rounded-lg shadow p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
-                              <h3 className="text-xl font-semibold mb-2">Premium&apos;a Geç</h3>
+              <h3 className="text-xl font-semibold mb-2">Premium&apos;a Geç</h3>
               <p className="text-white/80 mb-4">
                 Detaylı analizler, geçmiş quizler ve kişiselleştirilmiş öneriler için Premium üyeliğe geçin.
               </p>

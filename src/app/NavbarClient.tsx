@@ -2,14 +2,27 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "../lib/AuthContext";
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Bars3Icon, XMarkIcon, Cog6ToothIcon, ChartBarIcon, DocumentTextIcon, UserIcon } from '@heroicons/react/24/outline';
 import { useRouter } from "next/navigation";
 
 export default function NavbarClient() {
-  const { user, profile, signOut, loading } = useAuth();
+  const { user, profile, signOut, authState } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [isMenuOpen]);
 
   // Responsive breakpoint
   const navLinks = [
@@ -20,7 +33,7 @@ export default function NavbarClient() {
   ];
 
   // For non-logged in users
-  if (!loading && !user) {
+  if (authState === 'unauthenticated' && !user) {
     return (
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
@@ -132,7 +145,7 @@ export default function NavbarClient() {
 
           {/* Dropdown menu */}
           {isMenuOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
+            <div ref={menuRef} className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-3">
                   <UserIcon className="w-8 h-8 text-blue-600" />
@@ -176,12 +189,20 @@ export default function NavbarClient() {
                 >
                   <ChartBarIcon className="w-4 h-4" />
                   Kişisel Analiz
-                  {!profile?.is_premium && (
-                    <span className="ml-auto text-xs bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-2 py-1 rounded">Premium</span>
-                  )}
+                  <span className="ml-auto text-xs bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-2 py-1 rounded">Premium</span>
                 </Link>
                 
                 <Link 
+                  href="/notes" 
+                  className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <DocumentTextIcon className="w-4 h-4" />
+                  Notlarım
+                </Link>
+                
+                {/* Remove Yanlış Cevap Analizi link */}
+                {/* <Link 
                   href="/analysis/wrong-answers" 
                   className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
                   onClick={() => setIsMenuOpen(false)}
@@ -191,7 +212,7 @@ export default function NavbarClient() {
                   {!profile?.is_premium && (
                     <span className="ml-auto text-xs bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 px-2 py-1 rounded">Premium</span>
                   )}
-                </Link>
+                </Link> */}
                 
                 <div className="border-t border-gray-200 dark:border-gray-700 my-2"></div>
                 
@@ -205,12 +226,27 @@ export default function NavbarClient() {
                 </Link>
                 
                 <button
-                  onClick={async () => {
-                    await signOut();
-                    setIsMenuOpen(false);
-                    router.push("/giris");
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Logout button clicked!');
+                    try {
+                      console.log('Calling signOut...');
+                      await signOut();
+                      console.log('SignOut completed, redirecting...');
+                      setIsMenuOpen(false);
+                      // Force a page reload to ensure clean state
+                      window.location.href = "/giris";
+                    } catch (error) {
+                      console.error('Logout error:', error);
+                      // Still redirect even if there's an error
+                      setIsMenuOpen(false);
+                      window.location.href = "/giris";
+                    }
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 cursor-pointer"
+                  type="button"
+                  style={{ zIndex: 1000 }}
                 >
                   <UserIcon className="w-4 h-4" />
                   Çıkış Yap

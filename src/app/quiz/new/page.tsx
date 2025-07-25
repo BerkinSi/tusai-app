@@ -2,21 +2,9 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../../lib/AuthContext";
+import { supabase } from "../../../lib/supabaseClient";
+import BackButton from "../../../components/BackButton";
 import jsPDF from "jspdf";
-
-// Placeholder subjects - replace with Supabase fetch if needed
-const SUBJECTS = [
-  "Mikrobiyoloji",
-  "Patoloji",
-  "Fizyoloji",
-  "Biyokimya",
-  "Farmakoloji",
-  "Histoloji",
-  "Anatomi",
-  "Kardiyoloji",
-  "Nöroloji",
-  "Endokrinoloji"
-];
 
 const MODES = [
   { key: "karma", label: "Karma" },
@@ -36,12 +24,14 @@ const MODE_DESCRIPTIONS: Record<string, string> = {
 function QuizNewPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, profile, loading } = useAuth();
+  const { user, profile, authState } = useAuth();
 
   // Step state
   const [step, setStep] = useState(1);
 
   // Step 1: Subject & Mode
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [mode, setMode] = useState<string>("");
 
@@ -53,10 +43,50 @@ function QuizNewPageContent() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch subjects from API
+  useEffect(() => {
+    if (authState === 'authenticated') {
+      fetchSubjects();
+    }
+  }, [authState]);
+
+  const fetchSubjects = async () => {
+    setLoadingSubjects(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        return;
+      }
+
+      const response = await fetch('/api/subjects', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      if (response.ok) {
+        const subjectsData = await response.json();
+        const subjectNames = subjectsData.map((subject: any) => subject.name);
+        setSubjects(subjectNames);
+      }
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+      // Fallback to default subjects if API fails
+      const fallbackSubjects = ["Farmakoloji", "Mikrobiyoloji", "Fizyoloji", "Biyokimya", "Patoloji"];
+      setSubjects(fallbackSubjects);
+    } finally {
+      setLoadingSubjects(false);
+    }
+  };
+
   // Handle URL parameters for pre-selection
   useEffect(() => {
     const urlMode = searchParams.get('mode');
+    const urlSubject = searchParams.get('subject');
     const urlSubjects = searchParams.get('subjects');
+    
+    console.log('Quiz New - URL params:', { urlMode, urlSubject, urlSubjects });
+    console.log('Quiz New - Available subjects:', subjects);
     
     if (urlMode && MODES.some(m => m.key === urlMode)) {
       setMode(urlMode);
@@ -64,23 +94,29 @@ function QuizNewPageContent() {
       // Handle special cases for different modes
       if (urlMode === 'zayif') {
         // TODO: Replace with real weak subjects from user stats
-        setSelectedSubjects(SUBJECTS.slice(0, 3));
-      } else if (urlSubjects) {
-        // Handle specific subjects from URL
-        const subjects = urlSubjects.split(',').filter(s => SUBJECTS.includes(s));
-        if (subjects.length > 0) {
-          setSelectedSubjects(subjects);
-        }
+        setSelectedSubjects(subjects.slice(0, 3));
+      } else if (urlSubjects === 'all') {
+        // For mixed quiz, select all subjects
+        setSelectedSubjects(subjects);
+      } else if (urlSubject && subjects.includes(urlSubject)) {
+        // Handle specific subject from URL
+        setSelectedSubjects([urlSubject]);
       }
+    } else if (urlSubject && subjects.includes(urlSubject)) {
+      // If no mode specified but subject is, pre-select the subject
+      setSelectedSubjects([urlSubject]);
+    } else if (urlSubjects === 'all') {
+      // If subjects=all is specified, select all subjects
+      setSelectedSubjects(subjects);
     }
-  }, [searchParams]);
+  }, [searchParams, subjects]);
 
   // Edge cases
   useEffect(() => {
-    if (!loading && !user) {
+    if (authState === 'unauthenticated' && !user) {
       router.replace("/giris?next=/quiz/new");
     }
-  }, [user, loading, router]);
+  }, [user, authState, router]);
 
   // TODO: Replace with real daily limit logic
   const quizLimit = profile?.is_premium ? 5 : 1;
@@ -100,7 +136,7 @@ function QuizNewPageContent() {
     setMode(m);
     if (m === "zayif") {
       // TODO: Replace with real weak subjects from user stats
-      setSelectedSubjects(SUBJECTS.slice(0, 3));
+      setSelectedSubjects(subjects.slice(0, 3));
     }
   }
 
@@ -267,7 +303,7 @@ function QuizNewPageContent() {
   }, [step]);
 
   // Edge: Free user daily limit
-  if (!loading && user && !canCreateQuiz) {
+  if (authState === 'authenticated' && user && !canCreateQuiz) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6">
         <div className="max-w-md w-full bg-white dark:bg-tusai-dark rounded-lg shadow p-8 text-center">
@@ -284,7 +320,11 @@ function QuizNewPageContent() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-tusai-light dark:bg-tusai-dark py-8 px-2">
       <div className="w-full max-w-lg bg-white dark:bg-tusai-dark border border-tusai rounded-lg shadow-lg p-6 sm:p-8 flex flex-col items-center">
-        <h1 className="text-2xl font-bold text-tusai mb-6 text-center">Yeni Quiz Oluştur</h1>
+        <div className="w-full flex items-center justify-between mb-6">
+          <BackButton iconOnly={true} iconColorClass="text-black" />
+          <h1 className="text-2xl font-bold text-tusai text-center flex-1">Yeni Quiz Oluştur</h1>
+          <div className="w-6"></div> {/* Spacer to center the title */}
+        </div>
         {/* Stepper */}
         <div className="flex justify-center gap-2 mb-8">
           {[1, 2, 3].map((s) => (
@@ -297,16 +337,22 @@ function QuizNewPageContent() {
             <div className="mb-4 w-full">
               <div className="mb-2 font-medium">Konu:</div>
               <div className="flex flex-wrap gap-2">
-                {SUBJECTS.map((subject) => (
-                  <button
-                    key={subject}
-                    className={`px-3 py-1 rounded-full border text-sm font-medium ${selectedSubjects.includes(subject) ? "bg-tusai-accent text-white border-tusai-accent" : "bg-gray-100 dark:bg-tusai-dark/40 border-gray-300 dark:border-tusai-light/20 text-tusai"}`}
-                    onClick={() => mode === "zayif" ? undefined : handleSubjectToggle(subject)}
-                    disabled={mode === "zayif"}
-                  >
-                    {subject}
-                  </button>
-                ))}
+                {loadingSubjects ? (
+                  <div className="text-tusai-accent">Konular yükleniyor...</div>
+                ) : subjects.length === 0 ? (
+                  <div className="text-tusai-accent">Konular bulunamadı.</div>
+                ) : (
+                  subjects.map((subject) => (
+                    <button
+                      key={subject}
+                      className={`px-3 py-1 rounded-full border text-sm font-medium ${selectedSubjects.includes(subject) ? "bg-tusai-accent text-white border-tusai-accent" : "bg-gray-100 dark:bg-tusai-dark/40 border-gray-300 dark:border-tusai-light/20 text-tusai"}`}
+                      onClick={() => mode === "zayif" ? undefined : handleSubjectToggle(subject)}
+                      disabled={mode === "zayif"}
+                    >
+                      {subject}
+                    </button>
+                  ))
+                )}
               </div>
               {mode === "zayif" && (
                 <div className="mt-2 text-tusai-accent text-sm font-medium">Zayıf konularınız sistem tarafından otomatik belirlenecektir.</div>

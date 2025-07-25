@@ -1,59 +1,111 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../lib/AuthContext";
-import { UserCircleIcon, ArrowTrendingUpIcon, TrophyIcon, ArrowDownIcon, ArrowUpIcon } from '@heroicons/react/24/solid';
+import { UserCircleIcon, ArrowTrendingUpIcon, TrophyIcon, ArrowDownIcon, ArrowUpIcon, PlayIcon } from '@heroicons/react/24/solid';
 import Link from "next/link";
-
-const SUBJECTS = ["Farmakoloji", "Mikrobiyoloji", "Fizyoloji", "Biyokimya", "Patoloji"];
-
-// Mock leaderboard data
-const mockLeaderboard = Array.from({ length: 20 }, (_, i) => ({
-  rank: i + 1,
-  displayName: `anon_${2000 + i * 3}`,
-  questionsSolved: 120 - i * 3,
-  correctAnswers: 110 - i * 3,
-  accuracy: 95 - i,
-}));
-
-const currentUser = {
-  rank: 113,
-  displayName: "Berkin S.",
-  avatar: null, // or a URL
-  questionsSolved: 74,
-  correctAnswers: 66,
-  accuracy: 81,
-  subject: "Fizyoloji",
-  totalUsers: 4800,
-  above: { displayName: "anon_2847", correctAnswers: 70, questionsSolved: 78 },
-  below: { displayName: "anon_2850", correctAnswers: 62, questionsSolved: 72 },
-  toTop: 29,
-  toNext: 4,
-  toPass: 8,
-  toPassCount: 3,
-  motivational: "3 kişi geçmek için 8 doğru cevap daha çözmen yeterli. %3’lük dilimdesin, bu harika!"
-};
-
-
+import { supabase } from "../../lib/supabaseClient";
+import BackButton from "../../components/BackButton";
 
 export default function LeaderboardPage() {
-  const { profile } = useAuth();
-  const [subject, setSubject] = useState("Fizyoloji");
-  const [sortBy, setSortBy] = useState("correct");
-  const [sortDir, setSortDir] = useState<"desc" | "asc">("desc");
-  const [userInTop] = useState(false); // For mock, user not in top 20
+  const { profile, authState } = useAuth();
+  const [subject, setSubject] = useState<string>("Genel");
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
+  const [leaderboardData, setLeaderboardData] = useState<any>(null);
+  const [loadingLeaderboard, setLoadingLeaderboard] = useState(false);
+  const [sortBy, setSortBy] = useState<string>("correct");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const userRowRef = useRef<HTMLTableRowElement>(null);
+
+  // Fetch subjects from backend
+  useEffect(() => {
+    if (authState === 'authenticated') {
+      fetchSubjects();
+    }
+  }, [authState]);
+
+  // Force refresh subjects
+  const forceRefreshSubjects = () => {
+    setSubjects([]);
+    setSubject("Genel"); // Reset to Genel
+    setTimeout(() => {
+      fetchSubjects();
+    }, 100);
+  };
+
+  const fetchSubjects = async () => {
+    setLoadingSubjects(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        return;
+      }
+
+      const response = await fetch('/api/subjects', {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      if (response.ok) {
+        const subjectsData = await response.json();
+        const subjectNames = subjectsData.map((subject: any) => subject.name);
+        
+        // Add "Genel" at the beginning of the subjects list
+        const allSubjects = ["Genel", ...subjectNames];
+        setSubjects(allSubjects);
+        
+        // Always ensure "Genel" is selected initially
+        setSubject("Genel");
+      }
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+      // Fallback to default subjects if API fails
+      const fallbackSubjects = ["Genel", "Farmakoloji", "Mikrobiyoloji", "Fizyoloji", "Biyokimya", "Patoloji"];
+      setSubjects(fallbackSubjects);
+      setSubject("Genel");
+    } finally {
+      setLoadingSubjects(false);
+    }
+  };
+
+  // Fetch leaderboard data based on selected subject
+  useEffect(() => {
+    if (authState === 'authenticated' && subject) {
+      fetchLeaderboardData();
+    }
+  }, [authState, subject]);
+
+  const fetchLeaderboardData = async () => {
+    setLoadingLeaderboard(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        return;
+      }
+
+      // Always pass the subject parameter, even for "Genel"
+      const url = `/api/leaderboard?subject=${encodeURIComponent(subject || 'Genel')}`;
+
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setLeaderboardData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching leaderboard data:', error);
+    } finally {
+      setLoadingLeaderboard(false);
+    }
+  };
 
   // Empty state: user not in leaderboard for this subject
   const isEmpty = false; // set to true to test empty state
-
-  // Sort leaderboard mock data
-  const sortedLeaderboard = [...mockLeaderboard].sort((a, b) => {
-    let cmp = 0;
-    if (sortBy === "solved") cmp = b.questionsSolved - a.questionsSolved;
-    else if (sortBy === "accuracy") cmp = b.accuracy - a.accuracy;
-    else cmp = b.correctAnswers - a.correctAnswers;
-    return sortDir === "desc" ? cmp : -cmp;
-  });
 
   // Table header click handler
   function handleSort(col: string) {
@@ -69,9 +121,12 @@ export default function LeaderboardPage() {
     <div className="w-full max-w-3xl mx-auto px-2 sm:px-4 py-8 flex flex-col gap-8">
       {/* Header */}
       <header className="mb-2">
-        <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 flex items-center gap-2 mb-1">
-          <TrophyIcon className="w-7 h-7 text-yellow-500" /> Sıralamalar
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+          <BackButton iconOnly={true} iconColorClass="text-black" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-blue-600 flex items-center gap-2 mb-1">
+            <TrophyIcon className="w-7 h-7 text-yellow-500" /> Sıralamalar
+          </h1>
+        </div>
         <p className="text-gray-600 dark:text-gray-300 text-sm">Konulara göre sıralamalarda nerede olduğunu gör.</p>
       </header>
 
@@ -80,21 +135,32 @@ export default function LeaderboardPage() {
         <div className="mb-2">
           <span className="text-sm text-gray-500 font-medium">Konu Seç:</span>
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {SUBJECTS.map((s) => (
-            <button
-              key={s}
-              onClick={() => setSubject(s)}
-              className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition-all border text-sm
-                ${subject === s
-                  ? 'bg-blue-600 text-white border-blue-600 shadow font-bold'
-                  : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-800 hover:text-blue-700'}
-              `}
-              style={{ minWidth: 110 }}
-            >
-              {s}
-            </button>
-          ))}
+        
+        <div className="w-full">
+          {loadingSubjects ? (
+            <p className="px-4 py-2 rounded-full font-semibold whitespace-nowrap transition-all border text-sm bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-300 dark:border-gray-700">Yükleniyor...</p>
+          ) : subjects.length === 0 ? (
+            <p className="px-4 py-2 rounded-full font-semibold whitespace-nowrap transition-all border text-sm bg-red-200 dark:bg-red-700 text-red-600 dark:text-red-300 border-red-300 dark:border-red-700">Konular yüklenemedi</p>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2">
+                {subjects.map((s, index) => (
+                  <button
+                    key={`${s}-${index}`}
+                    onClick={() => setSubject(s)}
+                    className={`px-4 py-2 rounded-full font-semibold whitespace-nowrap transition-all border text-sm
+                      ${subject === s
+                        ? 'bg-blue-600 text-white border-blue-600 shadow font-bold'
+                        : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-800 hover:text-blue-700'}
+                    `}
+                    style={{ minWidth: 110 }}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -103,13 +169,31 @@ export default function LeaderboardPage() {
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-4 flex flex-col sm:flex-row items-center gap-3 shadow-sm">
           <ArrowTrendingUpIcon className="w-7 h-7 text-blue-600" />
           <div className="flex-1">
-            <div className="font-semibold text-blue-700 dark:text-blue-200 text-base">
-              {subject}’de {currentUser.totalUsers} kullanıcı arasında <span className="text-lg font-bold">{currentUser.rank}. sıradasın</span>.
-            </div>
-            <div className="text-gray-700 dark:text-gray-300 text-sm mt-1">
-              Bir üst sıradaki kullanıcıdan <b>{currentUser.toNext} doğru cevap</b>, liderden <b>{currentUser.toTop} doğru cevap</b> geridesin.
-            </div>
-            <div className="text-blue-700 dark:text-blue-200 text-sm mt-2 font-semibold">{currentUser.motivational}</div>
+            {loadingLeaderboard ? (
+              <div className="font-semibold text-blue-700 dark:text-blue-200 text-base">
+                Yükleniyor...
+              </div>
+            ) : (() => {
+              return leaderboardData && leaderboardData.insight;
+            })() ? (
+              <>
+                <div className="font-semibold text-blue-700 dark:text-blue-200 text-base">
+                  {leaderboardData.insight}
+                </div>
+                {leaderboardData.userRank && (
+                  <div className="text-gray-700 dark:text-gray-300 text-sm mt-1">
+                    Ortalama skorun: <b>{leaderboardData.userScore}</b>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="font-semibold text-blue-700 dark:text-blue-200 text-base">
+                {!subject || subject === null || subject === 'null' || subject === 'Genel' 
+                  ? 'Henüz quiz çözülmemiş.' 
+                  : `${subject} konusunda henüz quiz çözülmemiş.`
+                }
+              </div>
+            )}
           </div>
         </div>
       </aside>
@@ -146,53 +230,89 @@ export default function LeaderboardPage() {
               </tr>
             </thead>
             <tbody>
-              {sortedLeaderboard.map((row) => (
-                <tr key={row.rank} className="border-b last:border-0">
-                  <td className="py-2 px-2 font-semibold">{row.rank}</td>
-                  <td className="py-2 px-2 flex items-center gap-2">
-                    <UserCircleIcon className="w-5 h-5 text-gray-400" />
-                    <span>{row.displayName}</span>
+              {loadingLeaderboard ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
+                    Yükleniyor...
                   </td>
-                  <td className={`py-2 px-2 ${sortBy === 'solved' ? 'font-bold text-blue-600' : ''}`}>{row.questionsSolved}</td>
-                  <td className={`py-2 px-2 ${sortBy === 'correct' ? 'font-bold text-blue-600' : ''}`}>{row.correctAnswers}</td>
-                  <td className={`py-2 px-2 ${sortBy === 'accuracy' ? 'font-bold text-blue-600' : ''}`}>{row.accuracy}%</td>
                 </tr>
-              ))}
-              {/* If user is not in top 20, show ... and their row */}
-              {!userInTop && (
-                <>
-                  <tr><td colSpan={5} className="text-center text-gray-400 py-2">...</td></tr>
-                  <tr ref={userRowRef} className="border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/30">
-                    <td className="py-2 px-2 font-semibold">{currentUser.rank}</td>
-                    <td className="py-2 px-2 flex items-center gap-2">
-                      <UserCircleIcon className="w-5 h-5 text-blue-600" />
-                      <span className="font-bold text-blue-700 dark:text-blue-200">{profile?.full_name || currentUser.displayName}</span>
-                    </td>
-                    <td className="py-2 px-2 font-bold">{currentUser.questionsSolved}</td>
-                    <td className="py-2 px-2 font-bold">{currentUser.correctAnswers}</td>
-                    <td className="py-2 px-2 font-bold">{currentUser.accuracy}%</td>
-                  </tr>
-                  <tr className="border-b last:border-0">
-                    <td className="py-2 px-2 font-semibold">{currentUser.rank + 1}</td>
+              ) : leaderboardData?.topPerformers && leaderboardData.topPerformers.length > 0 ? (
+                leaderboardData.topPerformers.map((row: any, index: number) => (
+                  <tr key={row.user_id} className="border-b last:border-0">
+                    <td className="py-2 px-2 font-semibold">{index + 1}</td>
                     <td className="py-2 px-2 flex items-center gap-2">
                       <UserCircleIcon className="w-5 h-5 text-gray-400" />
-                      <span>{currentUser.below.displayName}</span>
+                      <span>{row.name}</span>
                     </td>
-                    <td className="py-2 px-2">{currentUser.below.questionsSolved}</td>
-                    <td className="py-2 px-2">-</td>
-                    <td className="py-2 px-2">-</td>
+                    <td className="py-2 px-2">{row.quizCount}</td>
+                    <td className="py-2 px-2 font-semibold text-blue-600">{row.avgScore}</td>
+                    <td className="py-2 px-2">{Math.round((row.avgScore / row.quizCount) * 100)}%</td>
                   </tr>
-                </>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-gray-500">
+                    {!subject || subject === 'null' || subject === 'Genel' 
+                      ? 'Henüz hiç quiz çözülmemiş.' 
+                      : `${subject} konusunda henüz quiz çözülmemiş.`
+                    }
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
+          <div className="mt-4 text-xs text-gray-500 text-center">
+            Bu sıralama anonim kullanıcı verilerine dayanmaktadır.
+          </div>
         </section>
       ) : (
-        <section className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 flex flex-col items-center justify-center gap-4">
-          <p className="text-gray-700 dark:text-gray-300 text-center text-lg font-medium mb-2">Bu sıralamada yer almıyorsun. Quiz çözerek yerini alabilirsin.</p>
-          <Link href="/quiz/new" className="px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded shadow text-base font-semibold">Quiz Çöz ve Sıralamaya Katıl →</Link>
+        <section className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+          <TrophyIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            {!subject || subject === 'null' || subject === 'Genel' 
+              ? 'Henüz Sıralamada Değilsin' 
+              : `${subject} Konusunda Henüz Sıralamada Değilsin`
+            }
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400 mb-4">
+            {!subject || subject === 'null' || subject === 'Genel'
+              ? 'Henüz hiç quiz çözülmemiş. İlk quiz\'ini çözerek sıralamaya katıl!'
+              : `${subject} konusunda henüz quiz çözülmemiş. İlk quiz'ini çözerek sıralamaya katıl!`
+            }
+          </p>
+          <Link href="/quiz" className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Quiz Çöz
+          </Link>
         </section>
       )}
+
+      {/* CTA Section */}
+      <section className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-xl p-6 text-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex items-center gap-2">
+            <TrophyIcon className="w-6 h-6 text-yellow-500" />
+            <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-200">
+              Sıralamada yükselmek ister misin?
+            </h3>
+          </div>
+          <p className="text-gray-600 dark:text-gray-300 text-sm max-w-md">
+            {subject === 'Genel' 
+              ? 'Tüm konulardan karışık bir quiz çöz ve genel sıralamada yerini al!'
+              : `${subject} konusunda yeni bir quiz çöz ve sıralamada yüksel!`
+            }
+          </p>
+          <Link 
+            href={subject === 'Genel' 
+              ? '/quiz/new?subjects=all' 
+              : `/quiz/new?subject=${encodeURIComponent(subject)}`
+            }
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-sm"
+          >
+            <PlayIcon className="w-5 h-5" />
+            {subject === 'Genel' ? 'Karışık Quiz Başlat' : `${subject} Quiz'i Başlat`}
+          </Link>
+        </div>
+      </section>
 
       {/* Privacy Note */}
       <footer className="mt-6 text-xs text-gray-500 dark:text-gray-400 text-center">

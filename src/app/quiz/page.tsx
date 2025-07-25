@@ -4,6 +4,7 @@ import { useAuth } from "../../lib/AuthContext";
 import FeatureGate from "../../lib/FeatureGate";
 import Link from "next/link";
 import { saveQuizResult, getQuizHistory, QuizResult } from "../../lib/quizHistory";
+import BackButton from '../../components/BackButton';
 
 const QUIZ_LIMIT_FREE = 1;
 const QUIZ_LIMIT_PREMIUM = 5;
@@ -27,7 +28,7 @@ const MOCK_QUESTIONS = [
 ];
 
 export default function QuizPage() {
-  const { profile, loading, user } = useAuth();
+  const { profile, authState, user } = useAuth();
   const [quizType, setQuizType] = useState<string | null>(null);
   const [quizCountToday] = useState(0); // TODO: Replace with real data
   const [started, setStarted] = useState(false);
@@ -41,7 +42,7 @@ export default function QuizPage() {
     }
   }, [user]);
 
-  if (loading) return null;
+  if (authState === "loading") return null;
 
   const isPremium = !!profile?.is_premium;
   const quizLimit = isPremium ? QUIZ_LIMIT_PREMIUM : QUIZ_LIMIT_FREE;
@@ -78,6 +79,7 @@ export default function QuizPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-tusai-light dark:bg-tusai-dark py-12">
+      <BackButton className="mb-4" />
       <div className="w-full max-w-lg bg-white dark:bg-tusai-dark border border-tusai rounded-lg shadow-lg p-8 flex flex-col items-center">
         <h1 className="text-2xl font-bold text-tusai mb-4 text-center">Quiz Seçimi</h1>
         {!started && (
