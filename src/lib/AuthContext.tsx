@@ -1,5 +1,6 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import * as React from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from './supabaseClient';
 import type { User } from '@supabase/supabase-js';
 
@@ -28,43 +29,55 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [authState, setAuthState] = useState<AuthState>('idle');
+  const [authState, setAuthState] = useState<AuthState>('loading');
   const [loading, setLoading] = useState(true);
 
-  // Computed loading state - only true when we're actively loading
-  const isLoading = authState === 'loading';
+  console.log('AuthContext: Component rendered with state:', {
+    authState,
+    hasUser: !!user,
+    hasProfile: !!profile,
+    loading
+  });
 
+  // Initialize auth state
   useEffect(() => {
-    console.log('AuthContext: Initializing auth state');
-    setAuthState('loading');
+    console.log('AuthContext: useEffect triggered');
     
     const initializeAuth = async () => {
       try {
-        console.log('AuthContext: Getting initial session');
+        console.log('AuthContext: Starting initialization...');
+        setLoading(true);
+        setAuthState('loading');
+        
+        // Get current session
         const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('AuthContext: Session check result:', !!session?.user, session?.user?.email);
         
         if (error) {
-          console.error('AuthContext: Error getting session:', error);
+          console.error('AuthContext: Session error:', error);
           setAuthState('error');
           setLoading(false);
           return;
         }
 
         if (session?.user) {
-          console.log('AuthContext: User found, loading profile');
+          console.log('AuthContext: User found in session:', session.user.email);
           setUser(session.user);
-          // Don't set loading here, let loadUserProfile handle the state
-          await loadUserProfile(session.user);
+          setAuthState('authenticated');
+          setLoading(false);
+          
+          // Fetch or create profile
+          await fetchOrCreateProfile(session.user);
         } else {
-          console.log('AuthContext: No user found');
+          console.log('AuthContext: No session found, setting unauthenticated');
           setAuthState('unauthenticated');
           setLoading(false);
         }
       } catch (error) {
-        console.error('AuthContext: Unexpected error during auth init:', error);
+        console.error('AuthContext: Initialization error:', error);
         setAuthState('error');
         setLoading(false);
       }
@@ -72,174 +85,159 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initializeAuth();
 
-    // Set up auth state change listener
-    // TEMPORARILY DISABLED - causing loading issues
-    /*
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('AuthContext: Auth state changed:', event, session?.user?.id);
-      
-      if (event === 'SIGNED_IN' && session?.user) {
-        // Only reload if we don't have a user OR if we have a different user
-        const isSameUser = user && user.id === session.user.id;
-        const isAlreadyAuthenticated = authState === 'authenticated' && profile;
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('AuthContext: Auth state change:', event, session?.user?.email);
         
-        if (!isSameUser && !isAlreadyAuthenticated) {
-          console.log('AuthContext: New user signed in, loading profile');
-          setAuthState('loading');
+        if (event === 'SIGNED_IN' && session?.user) {
+          console.log('AuthContext: User signed in');
           setUser(session.user);
-          await loadUserProfile(session.user);
-        } else {
-          console.log('AuthContext: Same user already authenticated, skipping re-load');
+          setAuthState('authenticated');
+          setLoading(false);
+          await fetchOrCreateProfile(session.user);
+        } else if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          console.log('AuthContext: Clearing state due to auth change:', event);
+          setUser(null);
+          setProfile(null);
+          setAuthState('unauthenticated');
+          setLoading(false);
         }
-      } else if (event === 'SIGNED_OUT') {
-        console.log('AuthContext: User signed out');
-        setAuthState('unauthenticated');
-        setUser(null);
-        setProfile(null);
-        setLoading(false);
       }
-    });
+    );
 
-    return () => {
-      if (authListener?.subscription) {
-        authListener.subscription.unsubscribe();
-      }
-    };
-    */
+    return () => subscription.unsubscribe();
   }, []);
 
-  const loadUserProfile = async (user: User) => {
+  const fetchOrCreateProfile = async (user: User) => {
     try {
-      console.log('AuthContext: Loading profile for user:', user.id);
-      setAuthState('loading'); // Set loading at the start
+      console.log('AuthContext: Fetching profile for user:', user.id);
       
-      const { data: existingProfile, error } = await supabase
+      // Try to fetch existing profile
+      const { data: existingProfile, error: fetchError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 = no rows returned
-        console.error('AuthContext: Error loading profile:', error);
-        setAuthState('error');
-        setLoading(false);
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('AuthContext: Error fetching profile:', fetchError);
         return;
       }
 
-      if (!existingProfile) {
-        console.log('AuthContext: Creating new profile for user');
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert({
-            id: user.id,
-            full_name: user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0],
-            avatar_url: user.user_metadata?.avatar_url || user.user_metadata?.picture,
-            email: user.email,
-            is_premium: false,
-          })
-          .select()
-          .single();
-
-        if (createError) {
-          console.error('AuthContext: Error creating profile:', createError);
-          setAuthState('error');
-          setLoading(false);
-          return;
-        }
-
-        setProfile(newProfile);
-      } else {
-        console.log('AuthContext: Profile loaded:', existingProfile.id);
+      if (existingProfile) {
+        console.log('AuthContext: Existing profile found:', existingProfile);
         setProfile(existingProfile);
-      }
-
-      // Always set to authenticated when profile is loaded/created
-      console.log('AuthContext: Setting state to authenticated');
-      setAuthState('authenticated');
-      setLoading(false);
-    } catch (error) {
-      console.error('AuthContext: Unexpected error loading profile:', error);
-      setAuthState('error');
-      setLoading(false);
-    }
-  };
-
-  const signOut = async () => {
-    console.log('AuthContext: SignOut called');
-    try {
-      setAuthState('loading');
-      
-      // Clear local state immediately for better UX
-      setUser(null);
-      setProfile(null);
-      
-      // Sign out from Supabase
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('AuthContext: Error during signOut:', error);
-        // Even if there's an error, we should still clear the state
-        setAuthState('unauthenticated');
-        setLoading(false);
         return;
       }
-      
-      setAuthState('unauthenticated');
-      setLoading(false);
-      console.log('AuthContext: SignOut completed successfully');
+
+      // Create new profile
+      console.log('AuthContext: Creating new profile for user:', user.id);
+      const newProfile = {
+        id: user.id,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || user.user_metadata?.name,
+        avatar_url: user.user_metadata?.avatar_url,
+        is_premium: false,
+        is_admin: false
+      };
+
+      const { data: createdProfile, error: createError } = await supabase
+        .from('profiles')
+        .insert([newProfile])
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('AuthContext: Error creating profile:', createError);
+        return;
+      }
+
+      console.log('AuthContext: Profile created successfully:', createdProfile);
+      setProfile(createdProfile);
     } catch (error) {
-      console.error('AuthContext: Unexpected error during signOut:', error);
-      // Even if there's an error, clear the state
-      setAuthState('unauthenticated');
-      setUser(null);
-      setProfile(null);
-      setLoading(false);
+      console.error('AuthContext: Error in fetchOrCreateProfile:', error);
     }
   };
 
   const signInWithGoogle = async () => {
-    console.log('AuthContext: SignInWithGoogle called');
     try {
-      setAuthState('loading');
+      setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`
         }
       });
-      
-      if (error) {
-        console.error('AuthContext: Error during Google sign in:', error);
-        setAuthState('error');
-        setLoading(false);
-      }
+      if (error) throw error;
     } catch (error) {
-      console.error('AuthContext: Unexpected error during Google sign in:', error);
-      setAuthState('error');
+      console.error('AuthContext: Sign in error:', error);
+      throw error;
+    } finally {
       setLoading(false);
     }
   };
 
   const signUpWithGoogle = async () => {
-    // Same as signInWithGoogle for OAuth
-    return signInWithGoogle();
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('AuthContext: Sign up error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      setLoading(true);
+      console.log('AuthContext: Starting sign out...');
+      
+      // First clear local state immediately
+      console.log('AuthContext: Clearing local state immediately...');
+      setUser(null);
+      setProfile(null);
+      setAuthState('unauthenticated');
+      setLoading(false); // Clear loading immediately
+      
+      // Then call Supabase signOut
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('AuthContext: Supabase signOut error:', error);
+        // Don't throw error, local state is already cleared
+      }
+      
+      console.log('AuthContext: Sign out completed successfully');
+    } catch (error) {
+      console.error('AuthContext: Sign out error:', error);
+      // Don't throw error, local state is already cleared
+      setLoading(false);
+    }
   };
 
   const value = {
     user,
     profile,
     authState,
-    loading: isLoading,
+    loading,
     signOut,
     signInWithGoogle,
-    signUpWithGoogle,
+    signUpWithGoogle
   };
 
-  // Debug logging for auth state changes
   console.log('AuthContext: Current state:', {
     authState,
     hasUser: !!user,
     hasProfile: !!profile,
-    loading: isLoading
+    loading
   });
 
   return (
@@ -247,12 +245,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}; 
+} 

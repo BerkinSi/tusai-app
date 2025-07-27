@@ -65,7 +65,7 @@ export const apiUtils = {
         return { error: 'Authentication required' };
       }
 
-      const url = `${process.env.NEXT_PUBLIC_API_URL || ''}${endpoint}`;
+      const url = `${endpoint}`;
       console.log('API: apiCall - Making request to:', url);
 
       const response = await fetch(url, {

@@ -7,14 +7,26 @@ const supabase = createClient(
 );
 
 export async function POST(req: NextRequest) {
+  console.log('=== GUMROAD WEBHOOK CALLED ===');
+  console.log('Request URL:', req.url);
+  console.log('Request method:', req.method);
+  
   const body = await req.formData();
   const secret = body.get("secret") as string;
-  if (secret !== process.env.GUMROAD_WEBHOOK_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const email = body.get("email") as string;
   const saleId = body.get("sale_id") as string;
+  
+  console.log('Received secret:', secret);
+  console.log('Expected secret:', process.env.GUMROAD_WEBHOOK_SECRET);
+  console.log('Email:', email);
+  console.log('Sale ID:', saleId);
+  
+  if (secret !== process.env.GUMROAD_WEBHOOK_SECRET) {
+    console.log('❌ SECRET MISMATCH!');
+    console.log('Received:', secret);
+    console.log('Expected:', process.env.GUMROAD_WEBHOOK_SECRET);
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const premiumUntil = body.get("subscription_ended_at") as string | null;
 
   // Find user by email in auth.users
