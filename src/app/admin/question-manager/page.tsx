@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import { useAuth } from '@/lib/AuthContext';
+import { useAdminAuth } from '@/lib/AdminAuthContext';
 import { QuestionConverter, QuestionData, QuestionImportResult } from '@/lib/questionConverter';
 
 export default function QuestionManager() {
-  const { user } = useAuth();
+  const { adminUser } = useAdminAuth();
   const [importResult, setImportResult] = useState<QuestionImportResult | null>(null);
   const [exportData, setExportData] = useState<QuestionData[]>([]);
   const [isImporting, setIsImporting] = useState(false);
@@ -35,7 +35,7 @@ export default function QuestionManager() {
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !user) return;
+    if (!file || !adminUser) return;
 
     setIsImporting(true);
     setImportResult(null);
@@ -64,7 +64,7 @@ export default function QuestionManager() {
       }
 
       // Import questions
-      const result = await QuestionConverter.importQuestionsFromJSON(questionsData, user.id);
+      const result = await QuestionConverter.importQuestionsFromJSON(questionsData, adminUser.id);
       setImportResult(result);
 
     } catch (error) {
@@ -80,7 +80,7 @@ export default function QuestionManager() {
   };
 
   const handleExport = async () => {
-    if (!user) return;
+    if (!adminUser) return;
 
     setIsExporting(true);
     try {

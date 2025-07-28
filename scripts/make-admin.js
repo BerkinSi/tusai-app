@@ -1,13 +1,15 @@
-require('dotenv').config();
+require('dotenv').config({ path: '.env.local' });
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-async function makeAdmin(userEmail) {
+async function makeUserAdmin(email) {
   try {
+    console.log(`Making user ${email} an admin...`);
+
     // First, get the user by email
     const { data: { users }, error: userError } = await supabase.auth.admin.listUsers();
     
@@ -16,43 +18,42 @@ async function makeAdmin(userEmail) {
       return;
     }
 
-    const user = users.find(u => u.email === userEmail);
+    const user = users.find(u => u.email === email);
     
     if (!user) {
-      console.error(`User with email ${userEmail} not found`);
-      console.log('Available users:');
-      users.forEach(u => console.log(`- ${u.email}`));
+      console.error(`User with email ${email} not found`);
       return;
     }
 
-    console.log(`Found user: ${user.email} (ID: ${user.id})`);
+    console.log(`Found user: ${user.id}`);
 
-    // Update the profile to make them admin
-    const { error: updateError } = await supabase
+    // Update the profile to make them an admin
+    const { data, error } = await supabase
       .from('profiles')
       .update({ is_admin: true })
-      .eq('id', user.id);
+      .eq('id', user.id)
+      .select();
 
-    if (updateError) {
-      console.error('Error updating profile:', updateError);
+    if (error) {
+      console.error('Error updating profile:', error);
       return;
     }
 
-    console.log(`✅ Successfully made ${userEmail} an admin!`);
-    console.log('You can now access the admin panel at: http://localhost:3000/admin/reports');
+    console.log(`Successfully made ${email} an admin!`);
+    console.log('Updated profile:', data);
 
   } catch (error) {
     console.error('Error:', error);
   }
 }
 
-// Get email from command line argument
-const userEmail = process.argv[2];
+// Get email from command line arguments
+const email = process.argv[2];
 
-if (!userEmail) {
-  console.log('Usage: node scripts/make-admin.js <user-email>');
-  console.log('Example: node scripts/make-admin.js support@tusai.app');
+if (!email) {
+  console.error('Please provide an email address:');
+  console.error('node scripts/make-admin.js user@example.com');
   process.exit(1);
 }
 
-makeAdmin(userEmail); 
+makeUserAdmin(email); 

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { MLTrainingDataService, AIQuestionGenerationService } from '@/lib/mlServices';
+import { useAdminAuth } from '@/lib/AdminAuthContext';
 
 interface TrainingStats {
   totalImages: number;
@@ -21,6 +22,7 @@ interface ModelMetrics {
 }
 
 export default function MLDashboard() {
+  const { adminUser } = useAdminAuth();
   const [stats, setStats] = useState<TrainingStats>({
     totalImages: 0,
     processedImages: 0,
@@ -108,6 +110,7 @@ export default function MLDashboard() {
         
         // Save to database
         await supabase.from('questions').insert({
+          user_id: adminUser?.id,
           subject_id: 1,
           question_text: question.questionText,
           options: question.options,
