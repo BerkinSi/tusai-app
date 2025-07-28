@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { useAdminAuth } from '@/lib/AdminAuthContext';
 import { QuestionConverter, QuestionData, QuestionImportResult } from '@/lib/questionConverter';
+import { adminSupabase } from '@/lib/adminSupabaseClient';
 
 export default function QuestionManager() {
   const { adminUser } = useAdminAuth();

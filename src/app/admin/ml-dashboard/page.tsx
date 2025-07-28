@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { adminSupabase } from '@/lib/adminSupabaseClient';
 import { MLTrainingDataService, AIQuestionGenerationService } from '@/lib/mlServices';
 import { useAdminAuth } from '@/lib/AdminAuthContext';
 
@@ -41,11 +41,11 @@ export default function MLDashboard() {
   const loadDashboardData = async () => {
     try {
       // Load training statistics
-      const { data: images } = await supabase
+      const { data: images } = await adminSupabase
         .from('images')
         .select('*');
 
-      const { data: trainingData } = await supabase
+      const { data: trainingData } = await adminSupabase
         .from('ml_training_data')
         .select('*');
 
@@ -109,7 +109,7 @@ export default function MLDashboard() {
         );
         
         // Save to database
-        await supabase.from('questions').insert({
+        await adminSupabase.from('questions').insert({
           user_id: adminUser?.id,
           subject_id: 1,
           question_text: question.questionText,

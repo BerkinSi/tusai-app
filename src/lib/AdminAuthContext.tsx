@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from './supabaseClient';
+import { adminSupabase } from './adminSupabaseClient';
 
 interface AdminUser {
   id: string;
@@ -29,7 +29,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
     checkAdminSession();
     
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = adminSupabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
           await checkAdminStatus();
@@ -45,7 +45,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAdminSession = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } } = await adminSupabase.auth.getSession();
       if (session?.user) {
         await checkAdminStatus();
       }
@@ -58,14 +58,14 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAdminStatus = async (): Promise<boolean> => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await adminSupabase.auth.getUser();
       if (!user) {
         setAdminUser(null);
         return false;
       }
 
       // Check if user is admin
-      const { data: profile, error } = await supabase
+      const { data: profile, error } = await adminSupabase
         .from('profiles')
         .select('*')
         .eq('id', user.id)
@@ -99,7 +99,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const adminSignIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await adminSupabase.auth.signInWithPassword({
         email,
         password
       });
@@ -112,7 +112,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       const isAdmin = await checkAdminStatus();
       if (!isAdmin) {
         // Sign out if not admin
-        await supabase.auth.signOut();
+        await adminSupabase.auth.signOut();
         return { error: { message: 'Access denied. Admin privileges required.' } };
       }
 
@@ -124,7 +124,7 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
 
   const adminSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await adminSupabase.auth.signOut();
       setAdminUser(null);
     } catch (error) {
       console.error('Admin sign out error:', error);
