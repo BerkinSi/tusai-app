@@ -59,6 +59,8 @@ export default function QuizPage() {
     });
   };
 
+  const correctCount = answers.filter((a, i) => a === MOCK_QUESTIONS[i].dogru).length;
+
   const handleSubmit = () => {
     setSubmitted(true);
     if (user?.id) {
@@ -74,8 +76,6 @@ export default function QuizPage() {
       setHistory(getQuizHistory(user.id));
     }
   };
-
-  const correctCount = answers.filter((a, i) => a === MOCK_QUESTIONS[i].dogru).length;
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-tusai-light dark:bg-tusai-dark py-12">

@@ -22,7 +22,7 @@ export default function GirisPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      setError("Giriş başarısız. Lütfen bilgilerinizi kontrol edin.");
+      setError("Giriş başarısız. Lütfen e-posta ve şifrenizi kontrol edin.");
     } else {
       router.push("/");
     }

@@ -32,11 +32,18 @@ export default function KayitPage() {
     // Create profile row
     const user = data.user;
     if (user) {
-      await supabase.from("profiles").insert({
+      const { error: profileError } = await supabase.from("profiles").insert({
         id: user.id,
         full_name: fullName,
         is_premium: false,
       });
+      
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        setError("Profil oluşturulurken hata oluştu. Lütfen tekrar deneyin.");
+        setLoading(false);
+        return;
+      }
     }
     setLoading(false);
     router.push("/giris");

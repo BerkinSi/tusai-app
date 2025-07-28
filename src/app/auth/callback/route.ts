@@ -40,6 +40,10 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(requestUrl.origin);
+  // Determine redirect URL based on environment
+  const redirectUrl = process.env.NODE_ENV === 'production' 
+    ? 'https://tusai.app' 
+    : requestUrl.origin;
+
+  return NextResponse.redirect(redirectUrl);
 } 
